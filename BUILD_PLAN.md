@@ -1,0 +1,123 @@
+# Wee Camp Layout Tool Build Plan
+
+This document describes the approach for building the local camp layout tool and
+the major components of the web interface.
+
+## Product Direction
+
+The tool is a local-only 2D planning app for laying out a Burning Man camp. It
+should make it fast to place vehicles, shade, tents, kitchen areas, keepout
+zones, and other labeled objects on a scaled site plan, then export the plan and
+inventory for review.
+
+The current implementation is intentionally a single static web page. That keeps
+the prototype easy to run, easy to share, and free of build tooling while we
+learn what layout workflows matter most.
+
+## Current Architecture
+
+- `index.html` contains the complete app: HTML, CSS, JavaScript, canvas drawing,
+  state model, import/export, and print/PDF rendering.
+- Browser local storage is used for autosave.
+- Exported `.json` layout files are the portable source of truth for named
+  versions, alternatives, and backups.
+- The canvas render, inventory panel, and print/PDF output are all generated
+  from the same in-memory JSON state.
+
+## Data Model
+
+The layout state is plain JSON:
+
+- `site`: fixed site dimensions, grid, snap distance, and service-lane width.
+- `placement`: address and orientation metadata such as frontage, mountain
+  direction, Man direction, and sun path.
+- `items`: every placed object, including geometry, position, rotation, label,
+  type, color, keepout status, lock status, group membership, and notes.
+- `groups`: logical clusters of item IDs that should move together.
+- `options`: user-facing display and editing toggles.
+- `view`: current canvas pan and zoom.
+
+## Web Tool Layout
+
+The app is arranged in three primary regions.
+
+Left sidebar:
+
+- Site settings and placement note.
+- Generic camp-pieces palette, with 12 ft x 20 ft Black Rock shade as the
+  primary shade structure preset.
+- 2026 constraint-object palette for the specific vehicle, trailer, solar, and
+  access assumptions collected this year.
+- Custom shape form for new rectangles and ellipses.
+- JSON import/export and Print / Save PDF commands.
+
+Center workspace:
+
+- Scaled 2D canvas.
+- Site boundary, grid, service lane, placed objects, keepout zones, snap guides,
+  and orientation labels.
+- Toolbar for selection actions, grouping, deletion, zoom, grid, and snap.
+- Bottom status readout for current view and selected object position.
+
+Right sidebar:
+
+- Selection inspector for editing one selected object.
+- Rotation buttons for coarse 90 degree turns and fine 5 degree adjustments.
+- Inventory table with counts, dimensions, and item types.
+- Summary metrics for item count, type count, total area, and keepout area.
+
+## Interaction Model
+
+- Drag objects to move them.
+- Drag empty canvas space to pan.
+- Mouse wheel zooms around the pointer.
+- Shift/meta/control click extends selection.
+- Selected groups move as a unit.
+- Snap uses object edges, object centers, site edges, and site center lines.
+- Locked items are selectable but not draggable or rotatable.
+
+## PDF Export
+
+The PDF flow uses the browser print dialog:
+
+- Render a print-only sheet with a high-resolution layout image.
+- Include placement metadata, site size, service-lane note, inventory, and
+  groups.
+- Use the browser's "Save as PDF" capability for output.
+
+This is good enough for the local prototype. If print fidelity becomes a
+problem, move PDF generation to a dedicated client-side PDF library.
+
+## Development Roadmap
+
+Near-term:
+
+- Add more realistic default objects and camp-specific presets.
+- Add editable orientation controls if placement changes.
+- Add collision and keepout warnings.
+- Add dimension labels and measuring tools.
+- Improve grouping, multi-select editing, and object alignment commands.
+
+Medium-term:
+
+- Add named layout alternatives in the app.
+- Add undo/redo.
+- Add layers for finalized zones, infrastructure, and personal camp objects.
+- Add object templates stored in JSON.
+- Add a constraint checklist panel tied to the layout objectives document.
+
+Later:
+
+- Consider splitting the app into separate source files if the single HTML file
+  becomes too hard to maintain.
+- Consider a lightweight build system only when the complexity justifies it.
+- Consider collaborative or cloud storage only if more than one person needs to
+  edit the plan.
+
+## Engineering Principles
+
+- Keep the app usable offline and locally.
+- Keep layout data human-readable and exportable.
+- Favor simple, inspectable interactions over hidden automation.
+- Keep constraints visible so layout decisions can be reviewed.
+- Avoid adding dependencies until they clearly reduce complexity.

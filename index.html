@@ -1,0 +1,2167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Camp Layout Planner</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f2ed;
+      --panel: #fffdfa;
+      --panel-2: #f7f6f1;
+      --ink: #202124;
+      --muted: #66706f;
+      --line: #d3d5cd;
+      --line-strong: #aeb5ae;
+      --accent: #1f766f;
+      --accent-dark: #15544f;
+      --warn: #b45b3f;
+      --blue: #506fa8;
+      --gold: #b1842e;
+      --green: #587f4b;
+      --shadow: 0 12px 28px rgba(29, 32, 30, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+    }
+
+    body {
+      display: grid;
+      grid-template-columns: minmax(270px, 320px) minmax(0, 1fr) minmax(300px, 370px);
+      grid-template-rows: 100%;
+    }
+
+    aside {
+      min-height: 0;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+      padding: 14px;
+    }
+
+    aside:last-child {
+      border-right: 0;
+      border-left: 1px solid var(--line);
+    }
+
+    main {
+      min-width: 0;
+      min-height: 0;
+      position: relative;
+      background: #ecece5;
+    }
+
+    h1 {
+      font-size: 19px;
+      line-height: 1.2;
+      margin: 0 0 4px;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      font-size: 13px;
+      line-height: 1.2;
+      margin: 18px 0 8px;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    h3 {
+      font-size: 14px;
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .subtle {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .toolbar {
+      position: absolute;
+      z-index: 4;
+      left: 12px;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid rgba(32, 33, 36, 0.12);
+      background: rgba(255, 253, 250, 0.94);
+      box-shadow: var(--shadow);
+      pointer-events: auto;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      min-height: 34px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--ink);
+      padding: 7px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      border-color: var(--line-strong);
+      background: #ffffff;
+    }
+
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    button.primary:hover {
+      background: var(--accent-dark);
+      border-color: var(--accent-dark);
+    }
+
+    button.danger {
+      color: #8f341f;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    label {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-height: 34px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 7px 9px;
+      font-weight: 400;
+    }
+
+    input[type="checkbox"] {
+      width: 16px;
+      min-height: 16px;
+      margin: 0;
+    }
+
+    input[type="color"] {
+      padding: 2px;
+      height: 34px;
+    }
+
+    textarea {
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .form-grid .full {
+      grid-column: 1 / -1;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .site-note {
+      margin-top: 9px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .site-note strong {
+      color: var(--ink);
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .rotation-controls {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .rotation-controls button {
+      min-width: 0;
+      padding-left: 6px;
+      padding-right: 6px;
+    }
+
+    .palette {
+      display: grid;
+      gap: 8px;
+    }
+
+    .palette button {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 18px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      text-align: left;
+      white-space: normal;
+    }
+
+    .swatch {
+      width: 18px;
+      height: 18px;
+      border: 1px solid rgba(0, 0, 0, 0.22);
+      border-radius: 4px;
+    }
+
+    .dims {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .canvas-wrap {
+      position: absolute;
+      inset: 0;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      cursor: default;
+    }
+
+    .status {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .status span {
+      min-height: 30px;
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 9px;
+      border: 1px solid rgba(32, 33, 36, 0.12);
+      background: rgba(255, 253, 250, 0.93);
+      color: var(--muted);
+      box-shadow: var(--shadow);
+      font-size: 12px;
+    }
+
+    .inventory-header,
+    .inventory-row {
+      display: grid;
+      grid-template-columns: minmax(86px, 1.3fr) 74px 66px 40px;
+      gap: 8px;
+      align-items: center;
+      min-height: 32px;
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+    }
+
+    .inventory-header {
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .inventory-row {
+      cursor: pointer;
+    }
+
+    .inventory-row:hover {
+      background: var(--panel-2);
+    }
+
+    .inventory-row.active {
+      background: rgba(31, 118, 111, 0.12);
+    }
+
+    .inventory-name {
+      display: flex;
+      gap: 7px;
+      min-width: 0;
+      align-items: center;
+    }
+
+    .inventory-name span:last-child {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      padding: 9px;
+      border-radius: 6px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 19px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .json-tools {
+      display: grid;
+      gap: 8px;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .selected-empty {
+      border: 1px dashed var(--line-strong);
+      background: var(--panel-2);
+      color: var(--muted);
+      padding: 12px;
+      border-radius: 6px;
+      line-height: 1.4;
+    }
+
+    .print-sheet {
+      display: none;
+    }
+
+    @media (max-width: 1080px) {
+      body {
+        grid-template-columns: 270px minmax(0, 1fr);
+      }
+
+      aside:last-child {
+        display: none;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        display: block;
+        overflow: auto;
+      }
+
+      aside {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+        max-height: none;
+      }
+
+      main {
+        height: 70vh;
+      }
+
+      .toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .toolbar-group {
+        max-width: calc(100vw - 24px);
+        overflow: auto;
+      }
+    }
+
+    @media print {
+      html,
+      body {
+        width: auto;
+        height: auto;
+        overflow: visible;
+        background: #ffffff;
+      }
+
+      body > aside,
+      body > main {
+        display: none;
+      }
+
+      .print-sheet {
+        display: block;
+        color: #111111;
+        font-family: Arial, sans-serif;
+        padding: 0;
+      }
+
+      .print-sheet h1 {
+        font-size: 20px;
+        margin-bottom: 2px;
+      }
+
+      .print-meta {
+        color: #555555;
+        font-size: 11px;
+        margin-bottom: 10px;
+      }
+
+      .print-layout {
+        width: 100%;
+        height: auto;
+        border: 1px solid #999999;
+      }
+
+      .print-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-top: 12px;
+      }
+
+      .print-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10px;
+      }
+
+      .print-table th,
+      .print-table td {
+        border-bottom: 1px solid #dddddd;
+        padding: 4px;
+        text-align: left;
+      }
+
+      .print-table th {
+        color: #333333;
+        text-transform: uppercase;
+        font-size: 9px;
+      }
+
+      @page {
+        size: landscape;
+        margin: 0.35in;
+      }
+    }
+  </style>
+</head>
+<body>
+  <aside>
+    <h1>Camp Layout Planner</h1>
+    <p class="subtle">Local browser prototype. Drag items, edit dimensions, snap edges, group clusters, and export the current layout.</p>
+
+    <h2>Site</h2>
+    <div class="form-grid">
+      <label>
+        Width ft
+        <input id="siteWidth" type="number" min="150" max="150" step="5" disabled>
+      </label>
+      <label>
+        Depth ft
+        <input id="siteHeight" type="number" min="150" max="150" step="5" disabled>
+      </label>
+      <label>
+        Grid ft
+        <input id="gridSize" type="number" min="1" step="1">
+      </label>
+      <label>
+        Snap ft
+        <input id="snapSize" type="number" min="0" step="0.5">
+      </label>
+    </div>
+    <div class="button-row">
+      <button id="fitView">Fit View</button>
+      <button id="resetDemo">Reset Demo</button>
+    </div>
+    <div class="site-note">
+      <strong>2026 placement: Delphi &amp; 3:45</strong>
+      150 ft frontage x 150 ft depth. Frontage is mid-block facing mountain.
+      The street/mountains are along the frontage edge; The Man is toward the
+      back of camp. Keep a 20 ft service lane clear.
+    </div>
+
+    <h2>Generic Camp Pieces</h2>
+    <div class="palette" id="palette"></div>
+
+    <h2>2026 Constraint Objects</h2>
+    <div class="button-row">
+      <button id="loadConstraintVehicles" class="primary">Load Constraint Vehicles</button>
+    </div>
+    <div class="palette" id="constraintPalette"></div>
+
+    <h2>Custom Shape</h2>
+    <div class="form-grid">
+      <label class="full">
+        Label
+        <input id="newLabel" value="Custom zone">
+      </label>
+      <label>
+        Type
+        <select id="newType">
+          <option value="vehicle">Vehicle</option>
+          <option value="shade">Shade</option>
+          <option value="kitchen">Kitchen</option>
+          <option value="tent">Tent</option>
+          <option value="fuel">Fuel</option>
+          <option value="water">Water</option>
+          <option value="keepout">Keepout</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+      <label>
+        Shape
+        <select id="newShape">
+          <option value="rect">Rectangle</option>
+          <option value="ellipse">Ellipse</option>
+        </select>
+      </label>
+      <label>
+        Width ft
+        <input id="newWidth" type="number" min="1" step="1" value="10">
+      </label>
+      <label>
+        Depth ft
+        <input id="newHeight" type="number" min="1" step="1" value="10">
+      </label>
+      <label>
+        Color
+        <input id="newColor" type="color" value="#506fa8">
+      </label>
+      <label class="full">
+        <span class="check-row"><input id="newKeepout" type="checkbox"> Keepout / access zone</span>
+      </label>
+    </div>
+    <div class="button-row">
+      <button id="addCustom" class="primary">Add Custom</button>
+    </div>
+
+    <h2>Files</h2>
+    <div class="json-tools">
+      <button id="exportJson">Export JSON</button>
+      <button id="copyLayoutLink">Copy Layout Link</button>
+      <button id="importJson">Import JSON</button>
+      <input id="importFile" class="file-input" type="file" accept="application/json,.json">
+      <button id="printPdf" class="primary">Print / Save PDF</button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <button id="selectAll">Select All</button>
+        <button id="duplicate" disabled>Duplicate</button>
+        <button id="group" disabled>Group</button>
+        <button id="ungroup" disabled>Ungroup</button>
+        <button id="delete" class="danger" disabled>Delete</button>
+      </div>
+      <div class="toolbar-group">
+        <button id="zoomOut">-</button>
+        <button id="zoomIn">+</button>
+        <button id="toggleSnap">Snap On</button>
+        <button id="toggleGrid">Grid On</button>
+      </div>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="canvas"></canvas>
+    </div>
+    <div class="status">
+      <span id="viewStatus">Ready</span>
+      <span id="saveStatus">Autosaved locally</span>
+    </div>
+  </main>
+
+  <aside>
+    <h2>Selection</h2>
+    <div id="selectionPanel"></div>
+
+    <h2>Inventory</h2>
+    <div class="inventory-header">
+      <span>Item</span>
+      <span>Type</span>
+      <span>Size</span>
+      <span>Qty</span>
+    </div>
+    <div id="inventory"></div>
+
+    <div class="summary" id="summary"></div>
+  </aside>
+
+  <section class="print-sheet" id="printSheet"></section>
+
+  <script>
+    const STORAGE_KEY = "camp-layout-planner-v1";
+    const DPR = Math.max(1, window.devicePixelRatio || 1);
+    const SITE_DEFAULTS = {
+      width: 150,
+      height: 150,
+      grid: 5,
+      snap: 2,
+      serviceLaneWidth: 20
+    };
+    const PLACEMENT_DEFAULTS = {
+      address: "Delphi & 3:45",
+      frontageFacing: "Mid-block facing mountain",
+      frontageDescription: "Street frontage / front yard",
+      manDirection: "Back of camp",
+      mountainDirection: "Street frontage",
+      sunPath: "East to west across the plan"
+    };
+
+    const palette = [
+      { label: "Black Rock shade", type: "shade", shape: "rect", width: 12, height: 20, color: "#d8a742" },
+      { label: "10x10 shade", type: "shade", shape: "rect", width: 10, height: 10, color: "#d8a742" },
+      { label: "10x20 shade", type: "shade", shape: "rect", width: 20, height: 10, color: "#d8a742" },
+      { label: "4-person tent", type: "tent", shape: "rect", width: 8, height: 8, color: "#5f8f5b" },
+      { label: "Hexayurt", type: "tent", shape: "rect", width: 12, height: 14, color: "#76a98f" },
+      { label: "Sprinter van", type: "vehicle", shape: "rect", width: 22, height: 8, color: "#5377b0" },
+      { label: "SUV (4Runner size)", type: "vehicle", shape: "rect", width: 16, height: 7, color: "#66788f", notes: "Generic SUV footprint based on a Toyota 4Runner, rounded for layout planning." },
+      { label: "Sedan (Prius size)", type: "vehicle", shape: "rect", width: 15, height: 6, color: "#7a8792", notes: "Generic sedan footprint based on a Toyota Prius, rounded for layout planning." },
+      { label: "Pickup truck", type: "vehicle", shape: "rect", width: 19, height: 7, color: "#6b7785" },
+      { label: "Box truck", type: "vehicle", shape: "rect", width: 26, height: 9, color: "#48586b" },
+      { label: "Trailer", type: "vehicle", shape: "rect", width: 18, height: 8, color: "#7b697c" },
+      { label: "Bike rack", type: "other", shape: "rect", width: 3, height: 6, color: "#4f8f7b", notes: "Bike rack footprint." },
+      { label: "Generator area", type: "other", shape: "rect", width: 6, height: 6, color: "#9f7c3a", keepout: true, notes: "Generator footprint and immediate keep-clear area." },
+      { label: "Kitchen zone", type: "kitchen", shape: "rect", width: 24, height: 16, color: "#bd7a45" },
+      { label: "Fuel storage", type: "fuel", shape: "rect", width: 8, height: 8, color: "#bd5942", keepout: true },
+      { label: "Water tank keepout", type: "water", shape: "rect", width: 18, height: 14, color: "#3b8d9b", keepout: true },
+      { label: "Round dome", type: "shade", shape: "ellipse", width: 24, height: 24, color: "#7c7fb3" },
+      { label: "Elephant MV parking", type: "other", shape: "ellipse", width: 40, height: 40, color: "#4f9f5f", notes: "40 ft diameter parking zone for Elephant Mutant Vehicle." }
+    ];
+
+    const constrainedVehicleTemplates = [
+      {
+        constraintId: "vehicle-loren-rommel",
+        label: "Loren Tacoma + trailer",
+        type: "vehicle",
+        shape: "rect",
+        width: 34,
+        height: 8,
+        color: "#5f6f83",
+        x: 24,
+        y: 62,
+        notes: "Toyota Tacoma 18 ft plus 16 ft trailer, modeled as combined 34 ft x 8 ft placeholder. Confirm width and whether truck/trailer can detach."
+      },
+      {
+        constraintId: "vehicle-ash-sprinter",
+        label: "Ash Sprinter",
+        type: "vehicle",
+        shape: "rect",
+        width: 20,
+        height: 8,
+        color: "#5377b0",
+        x: 62,
+        y: 62,
+        notes: "20 ft Sprinter van. Width TBD; modeled as 8 ft until confirmed."
+      },
+      {
+        constraintId: "vehicle-ryan-sprinter-carport",
+        label: "Ryan van + carport",
+        type: "vehicle",
+        shape: "rect",
+        width: 20,
+        height: 20,
+        color: "#597ca8",
+        x: 86,
+        y: 62,
+        notes: "Sprinter van and carport kept together as a 20 ft x 20 ft compound footprint. Confirm carport orientation and door-side clearance."
+      },
+      {
+        constraintId: "vehicle-aidan-camper-van",
+        label: "Aidan camper van",
+        type: "vehicle",
+        shape: "rect",
+        width: 22,
+        height: 8,
+        color: "#5377b0",
+        x: 110,
+        y: 62,
+        notes: "22 ft camper van. Width TBD; modeled as 8 ft until confirmed."
+      },
+      {
+        constraintId: "vehicle-alice-rv",
+        label: "Alice RV",
+        type: "vehicle",
+        shape: "rect",
+        width: 30,
+        height: 10,
+        color: "#7d7188",
+        x: 24,
+        y: 86,
+        notes: "30 ft RV. Width, slide-outs, awning, door side, and access needs TBD; modeled as 30 ft x 10 ft placeholder."
+      },
+      {
+        constraintId: "vehicle-eyal-trailer",
+        label: "Eyal trailer",
+        type: "vehicle",
+        shape: "rect",
+        width: 12,
+        height: 8,
+        color: "#7b697c",
+        x: 58,
+        y: 86,
+        notes: "12 ft trailer. Width, tow vehicle, detach status, and sleeping use TBD."
+      },
+      {
+        constraintId: "vehicle-team-box-truck",
+        label: "Team box truck",
+        type: "vehicle",
+        shape: "rect",
+        width: 35,
+        height: 9,
+        color: "#48586b",
+        x: 74,
+        y: 86,
+        notes: "35 ft box truck. Width and loading-door access side TBD; consider edge placement and storage/kitchen access."
+      },
+      {
+        constraintId: "vehicle-jeb-rissa-solar",
+        label: "Jeb/Rissa solar zone",
+        type: "other",
+        shape: "rect",
+        width: 12,
+        height: 12,
+        color: "#c6a33a",
+        x: 113,
+        y: 86,
+        notes: "12 ft x 12 ft south-facing lower-shade footprint. Needs clear sun exposure for solar panels. Confirm whether this is vehicle, trailer, or standalone solar setup."
+      },
+      {
+        constraintId: "vehicle-team-cargo-trailer",
+        label: "Team cargo trailer + stairs",
+        type: "vehicle",
+        shape: "rect",
+        width: 45,
+        height: 15,
+        color: "#6c5f73",
+        x: 24,
+        y: 104,
+        notes: "45 ft x 9 ft cargo trailer plus 6 ft stair/access allowance, modeled as 45 ft x 15 ft effective footprint. Confirm stair side and access geometry."
+      }
+    ];
+
+    const demoLayout = {
+      version: 1,
+      units: "feet",
+      site: { width: 150, height: 150, grid: 5, snap: 2, serviceLaneWidth: 20, fixed: true },
+      placement: { ...PLACEMENT_DEFAULTS },
+      view: { x: 0, y: 0, scale: 5 },
+      options: { snap: true, grid: true },
+      groups: [
+        { id: "group-kitchen", label: "Kitchen cluster", itemIds: ["kitchen-1", "shade-2"] }
+      ],
+      items: [
+        item("service-lane-1", "20 ft service lane", "keepout", "rect", 0, 0, 20, 150, 0, "#9ea7a1", true, "Keep clear for access and service vehicles.", true),
+        item("site-keepout", "Water access keepout", "water", "rect", 116, 10, 24, 16, 0, "#3b8d9b", true, "Leave this open for refills and service access."),
+        item("fuel-1", "Fuel storage", "fuel", "rect", 132, 118, 10, 8, 0, "#bd5942", true, "Downwind edge, away from kitchen."),
+        item("kitchen-1", "Kitchen work area", "kitchen", "rect", 46, 38, 28, 18, 0, "#bd7a45", false, "Tables, stoves, dish station."),
+        item("shade-2", "Kitchen Black Rock shade", "shade", "rect", 44, 36, 12, 20, 0, "#d8a742", false, ""),
+        item("van-1", "Sprinter van A", "vehicle", "rect", 24, 14, 22, 8, 0, "#5377b0", false, ""),
+        item("van-2", "Sprinter van B", "vehicle", "rect", 24, 24, 22, 8, 0, "#5377b0", false, ""),
+        item("trailer-1", "Kitchen trailer", "vehicle", "rect", 76, 40, 18, 8, 90, "#7b697c", false, ""),
+        item("shade-1", "Main shade", "shade", "rect", 72, 18, 40, 30, 0, "#d8a742", false, ""),
+        item("dome-1", "Dome lounge", "shade", "ellipse", 104, 56, 24, 24, 0, "#7c7fb3", false, ""),
+        item("tent-1", "Tent 1", "tent", "rect", 28, 112, 8, 8, 0, "#5f8f5b", false, ""),
+        item("tent-2", "Tent 2", "tent", "rect", 38, 112, 8, 8, 0, "#5f8f5b", false, ""),
+        item("tent-3", "Tent 3", "tent", "rect", 48, 112, 8, 8, 0, "#5f8f5b", false, "")
+      ]
+    };
+
+    let state = loadState();
+    let selectedIds = [];
+    let drag = null;
+    let lastPointer = null;
+    let saveTimer = null;
+    let idCounter = Date.now();
+
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const els = {
+      siteWidth: document.getElementById("siteWidth"),
+      siteHeight: document.getElementById("siteHeight"),
+      gridSize: document.getElementById("gridSize"),
+      snapSize: document.getElementById("snapSize"),
+      palette: document.getElementById("palette"),
+      constraintPalette: document.getElementById("constraintPalette"),
+      selectionPanel: document.getElementById("selectionPanel"),
+      inventory: document.getElementById("inventory"),
+      summary: document.getElementById("summary"),
+      viewStatus: document.getElementById("viewStatus"),
+      saveStatus: document.getElementById("saveStatus"),
+      printSheet: document.getElementById("printSheet")
+    };
+
+    function item(id, label, type, shape, x, y, width, height, rotation, color, keepout, notes, locked = false) {
+      return {
+        id,
+        label,
+        type,
+        shape,
+        x,
+        y,
+        width,
+        height,
+        rotation,
+        color,
+        keepout,
+        locked,
+        groupId: null,
+        notes: notes || ""
+      };
+    }
+
+    function cloneLayout(layout) {
+      return JSON.parse(JSON.stringify(layout));
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.items && parsed.site) return normalizeLayout(parsed);
+        }
+      } catch (error) {
+        console.warn(error);
+      }
+      const layout = cloneLayout(demoLayout);
+      for (const group of layout.groups) {
+        for (const id of group.itemIds) {
+          const found = layout.items.find((entry) => entry.id === id);
+          if (found) found.groupId = group.id;
+        }
+      }
+      return normalizeLayout(layout);
+    }
+
+    function normalizeLayout(layout) {
+      layout.version = Math.max(2, Number(layout.version || 1));
+      layout.units = "feet";
+      layout.site = {
+        ...layout.site,
+        width: SITE_DEFAULTS.width,
+        height: SITE_DEFAULTS.height,
+        grid: Number(layout.site && layout.site.grid) || SITE_DEFAULTS.grid,
+        snap: Number(layout.site && layout.site.snap) || SITE_DEFAULTS.snap,
+        serviceLaneWidth: SITE_DEFAULTS.serviceLaneWidth,
+        fixed: true
+      };
+      layout.placement = { ...PLACEMENT_DEFAULTS, ...(layout.placement || {}) };
+      layout.options = layout.options || { snap: true, grid: true };
+      layout.groups = layout.groups || [];
+      ensureServiceLane(layout);
+      return layout;
+    }
+
+    function ensureServiceLane(layout) {
+      const lane = layout.items.find((entry) => entry.id === "service-lane-1");
+      const laneData = item("service-lane-1", "20 ft service lane", "keepout", "rect", 0, 0, SITE_DEFAULTS.serviceLaneWidth, SITE_DEFAULTS.height, 0, "#9ea7a1", true, "Keep clear for access and service vehicles.", true);
+      if (lane) {
+        Object.assign(lane, laneData);
+      } else {
+        layout.items.unshift(laneData);
+      }
+    }
+
+    function saveSoon() {
+      els.saveStatus.textContent = "Saving...";
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        els.saveStatus.textContent = "Autosaved locally";
+      }, 180);
+    }
+
+    function uniqueId(prefix) {
+      idCounter += 1;
+      return `${prefix}-${idCounter.toString(36)}`;
+    }
+
+    function screenToWorld(point) {
+      return {
+        x: (point.x - state.view.x) / state.view.scale,
+        y: (point.y - state.view.y) / state.view.scale
+      };
+    }
+
+    function worldToScreen(point) {
+      return {
+        x: point.x * state.view.scale + state.view.x,
+        y: point.y * state.view.scale + state.view.y
+      };
+    }
+
+    function pointerEventPoint(event) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+      };
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.max(1, Math.round(rect.width * DPR));
+      canvas.height = Math.max(1, Math.round(rect.height * DPR));
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      draw();
+    }
+
+    function fitView() {
+      const rect = canvas.getBoundingClientRect();
+      const pad = 60;
+      const scaleX = (rect.width - pad * 2) / state.site.width;
+      const scaleY = (rect.height - pad * 2) / state.site.height;
+      state.view.scale = Math.max(1.5, Math.min(scaleX, scaleY));
+      state.view.x = (rect.width - state.site.width * state.view.scale) / 2;
+      state.view.y = (rect.height - state.site.height * state.view.scale) / 2;
+      saveSoon();
+      draw();
+    }
+
+    function draw() {
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      drawBackground(rect.width, rect.height);
+      drawSite();
+      if (state.options.grid) drawGrid();
+      drawSnapGuides();
+      const sorted = state.items.slice().sort((a, b) => Number(a.keepout) - Number(b.keepout));
+      for (const entry of sorted) drawItem(entry);
+      drawSelectionOutline();
+      drawOrientationOverlay();
+      updateStatus();
+    }
+
+    function drawBackground(width, height) {
+      ctx.save();
+      ctx.fillStyle = "#ecece5";
+      ctx.fillRect(0, 0, width, height);
+      ctx.restore();
+    }
+
+    function drawSite() {
+      const p = worldToScreen({ x: 0, y: 0 });
+      const w = state.site.width * state.view.scale;
+      const h = state.site.height * state.view.scale;
+      ctx.save();
+      ctx.fillStyle = "#fbfbf7";
+      ctx.strokeStyle = "#4b4f4a";
+      ctx.lineWidth = 2;
+      ctx.fillRect(p.x, p.y, w, h);
+      ctx.strokeRect(p.x, p.y, w, h);
+      ctx.fillStyle = "#4b4f4a";
+      ctx.font = "12px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+      ctx.fillText(`${state.site.width} ft x ${state.site.height} ft`, p.x + 10, p.y + 20);
+      ctx.restore();
+    }
+
+    function drawOrientationOverlay() {
+      const p = worldToScreen({ x: 0, y: 0 });
+      const q = worldToScreen({ x: state.site.width, y: state.site.height });
+      const midX = (p.x + q.x) / 2;
+      ctx.save();
+      ctx.lineWidth = 2;
+      drawArrow(ctx, midX, q.y - 46, midX, q.y - 16, "#6f7f8f");
+      drawBadge("Street / mountains", midX, q.y - 56, "#ffffff");
+      drawArrow(ctx, midX, p.y + 48, midX, p.y + 18, "#506fa8");
+      drawBadge("The Man", midX, p.y + 60, "#ffffff");
+      drawArrow(ctx, p.x + 34, p.y + 30, q.x - 34, p.y + 30, "#b1842e");
+      drawBadge("Sun path E -> W", midX, p.y + 30, "#fffdfa");
+      drawBadge(`${state.placement.address} frontage: ${state.placement.frontageFacing}`, midX, q.y - 18, "#fffdfa");
+      ctx.restore();
+    }
+
+    function drawArrow(targetCtx, x1, y1, x2, y2, color) {
+      const angle = Math.atan2(y2 - y1, x2 - x1);
+      const head = 9;
+      targetCtx.save();
+      targetCtx.strokeStyle = color;
+      targetCtx.fillStyle = color;
+      targetCtx.beginPath();
+      targetCtx.moveTo(x1, y1);
+      targetCtx.lineTo(x2, y2);
+      targetCtx.stroke();
+      targetCtx.beginPath();
+      targetCtx.moveTo(x2, y2);
+      targetCtx.lineTo(x2 - head * Math.cos(angle - Math.PI / 6), y2 - head * Math.sin(angle - Math.PI / 6));
+      targetCtx.lineTo(x2 - head * Math.cos(angle + Math.PI / 6), y2 - head * Math.sin(angle + Math.PI / 6));
+      targetCtx.closePath();
+      targetCtx.fill();
+      targetCtx.restore();
+    }
+
+    function drawBadge(text, x, y, fill) {
+      ctx.save();
+      ctx.font = "12px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      const width = ctx.measureText(text).width + 14;
+      ctx.fillStyle = fill;
+      ctx.strokeStyle = "rgba(32, 33, 36, 0.18)";
+      ctx.fillRect(x - width / 2, y - 10, width, 20);
+      ctx.strokeRect(x - width / 2, y - 10, width, 20);
+      ctx.fillStyle = "#202124";
+      ctx.fillText(text, x, y);
+      ctx.restore();
+    }
+
+    function drawGrid() {
+      const grid = Math.max(1, state.site.grid || 5);
+      const start = worldToScreen({ x: 0, y: 0 });
+      const end = worldToScreen({ x: state.site.width, y: state.site.height });
+      ctx.save();
+      ctx.strokeStyle = "rgba(76, 82, 76, 0.16)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= state.site.width; x += grid) {
+        const px = worldToScreen({ x, y: 0 }).x;
+        ctx.beginPath();
+        ctx.moveTo(px, start.y);
+        ctx.lineTo(px, end.y);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= state.site.height; y += grid) {
+        const py = worldToScreen({ x: 0, y }).y;
+        ctx.beginPath();
+        ctx.moveTo(start.x, py);
+        ctx.lineTo(end.x, py);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawSnapGuides() {
+      if (!drag || !drag.guides) return;
+      ctx.save();
+      ctx.strokeStyle = "rgba(31, 118, 111, 0.7)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([5, 5]);
+      for (const guide of drag.guides) {
+        if (guide.axis === "x") {
+          const p = worldToScreen({ x: guide.value, y: 0 });
+          const q = worldToScreen({ x: guide.value, y: state.site.height });
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(q.x, q.y);
+          ctx.stroke();
+        } else {
+          const p = worldToScreen({ x: 0, y: guide.value });
+          const q = worldToScreen({ x: state.site.width, y: guide.value });
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(q.x, q.y);
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
+
+    function drawItem(entry) {
+      const center = worldToScreen({ x: entry.x + entry.width / 2, y: entry.y + entry.height / 2 });
+      const w = entry.width * state.view.scale;
+      const h = entry.height * state.view.scale;
+      const selected = selectedIds.includes(entry.id);
+      ctx.save();
+      ctx.translate(center.x, center.y);
+      ctx.rotate((entry.rotation || 0) * Math.PI / 180);
+      ctx.fillStyle = entry.keepout ? stripePattern(entry.color) : entry.color;
+      ctx.strokeStyle = selected ? "#111111" : shade(entry.color, -35);
+      ctx.lineWidth = selected ? 2.5 : 1.2;
+      if (entry.shape === "ellipse") {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, w / 2, h / 2, 0, 0, Math.PI * 2);
+        ctx.globalAlpha = itemFillAlpha(entry);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.stroke();
+      } else {
+        ctx.globalAlpha = itemFillAlpha(entry);
+        ctx.fillRect(-w / 2, -h / 2, w, h);
+        ctx.globalAlpha = 1;
+        ctx.strokeRect(-w / 2, -h / 2, w, h);
+      }
+      if (entry.locked) {
+        ctx.fillStyle = "rgba(255, 255, 255, 0.72)";
+        ctx.fillRect(w / 2 - 18, -h / 2 + 4, 14, 14);
+        ctx.fillStyle = "#333333";
+        ctx.font = "10px sans-serif";
+        ctx.fillText("L", w / 2 - 14, -h / 2 + 15);
+      }
+      const textMax = Math.max(30, w - 8);
+      ctx.fillStyle = readableTextColor(entry.color);
+      ctx.font = `${Math.max(10, Math.min(15, h * 0.22))}px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      const label = fitText(entry.label, textMax);
+      ctx.fillText(label, 0, -4);
+      ctx.font = "10px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+      ctx.fillText(`${entry.width}x${entry.height}`, 0, 10);
+      ctx.restore();
+    }
+
+    function itemFillAlpha(entry) {
+      if (entry.type === "shade") return 0.42;
+      if (entry.keepout) return 0.78;
+      return 1;
+    }
+
+    function stripePattern(color) {
+      const patternCanvas = document.createElement("canvas");
+      patternCanvas.width = 12;
+      patternCanvas.height = 12;
+      const pctx = patternCanvas.getContext("2d");
+      pctx.fillStyle = color;
+      pctx.fillRect(0, 0, 12, 12);
+      pctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+      pctx.lineWidth = 3;
+      pctx.beginPath();
+      pctx.moveTo(-2, 12);
+      pctx.lineTo(12, -2);
+      pctx.stroke();
+      return ctx.createPattern(patternCanvas, "repeat");
+    }
+
+    function drawSelectionOutline() {
+      if (!selectedIds.length) return;
+      const selected = selectedIds.map(byId).filter(Boolean);
+      const bounds = combinedBounds(selected);
+      if (!bounds) return;
+      const p = worldToScreen({ x: bounds.left, y: bounds.top });
+      const q = worldToScreen({ x: bounds.right, y: bounds.bottom });
+      ctx.save();
+      ctx.strokeStyle = "#111111";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.strokeRect(p.x, p.y, q.x - p.x, q.y - p.y);
+      ctx.restore();
+    }
+
+    function fitText(text, maxWidth) {
+      if (ctx.measureText(text).width <= maxWidth) return text;
+      let short = text;
+      while (short.length > 3 && ctx.measureText(`${short}...`).width > maxWidth) {
+        short = short.slice(0, -1);
+      }
+      return `${short}...`;
+    }
+
+    function readableTextColor(color) {
+      const hex = color.replace("#", "");
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      return (r * 0.299 + g * 0.587 + b * 0.114) > 145 ? "#202124" : "#ffffff";
+    }
+
+    function shade(color, amount) {
+      const hex = color.replace("#", "");
+      const parts = [0, 2, 4].map((start) => parseInt(hex.slice(start, start + 2), 16));
+      return "#" + parts.map((value) => {
+        const next = Math.max(0, Math.min(255, value + amount));
+        return next.toString(16).padStart(2, "0");
+      }).join("");
+    }
+
+    function byId(id) {
+      return state.items.find((entry) => entry.id === id);
+    }
+
+    function itemBounds(entry) {
+      if (!entry) return null;
+      if (!entry.rotation || entry.rotation % 180 === 0) {
+        return {
+          left: entry.x,
+          right: entry.x + entry.width,
+          top: entry.y,
+          bottom: entry.y + entry.height
+        };
+      }
+      const angle = entry.rotation * Math.PI / 180;
+      const cx = entry.x + entry.width / 2;
+      const cy = entry.y + entry.height / 2;
+      const corners = [
+        { x: -entry.width / 2, y: -entry.height / 2 },
+        { x: entry.width / 2, y: -entry.height / 2 },
+        { x: entry.width / 2, y: entry.height / 2 },
+        { x: -entry.width / 2, y: entry.height / 2 }
+      ].map((p) => ({
+        x: cx + p.x * Math.cos(angle) - p.y * Math.sin(angle),
+        y: cy + p.x * Math.sin(angle) + p.y * Math.cos(angle)
+      }));
+      return {
+        left: Math.min(...corners.map((p) => p.x)),
+        right: Math.max(...corners.map((p) => p.x)),
+        top: Math.min(...corners.map((p) => p.y)),
+        bottom: Math.max(...corners.map((p) => p.y))
+      };
+    }
+
+    function combinedBounds(items) {
+      const bounds = items.map(itemBounds).filter(Boolean);
+      if (!bounds.length) return null;
+      return {
+        left: Math.min(...bounds.map((b) => b.left)),
+        right: Math.max(...bounds.map((b) => b.right)),
+        top: Math.min(...bounds.map((b) => b.top)),
+        bottom: Math.max(...bounds.map((b) => b.bottom))
+      };
+    }
+
+    function hitTest(world) {
+      for (let i = state.items.length - 1; i >= 0; i -= 1) {
+        const entry = state.items[i];
+        const cx = entry.x + entry.width / 2;
+        const cy = entry.y + entry.height / 2;
+        const angle = -(entry.rotation || 0) * Math.PI / 180;
+        const dx = world.x - cx;
+        const dy = world.y - cy;
+        const localX = dx * Math.cos(angle) - dy * Math.sin(angle);
+        const localY = dx * Math.sin(angle) + dy * Math.cos(angle);
+        if (entry.shape === "ellipse") {
+          const nx = localX / (entry.width / 2);
+          const ny = localY / (entry.height / 2);
+          if (nx * nx + ny * ny <= 1) return entry;
+        } else if (Math.abs(localX) <= entry.width / 2 && Math.abs(localY) <= entry.height / 2) {
+          return entry;
+        }
+      }
+      return null;
+    }
+
+    function activeDragIds(entry) {
+      if (!entry) return [];
+      if (selectedIds.includes(entry.id)) {
+        return expandedSelection();
+      }
+      if (entry.groupId) {
+        return groupIds(entry.groupId);
+      }
+      return [entry.id];
+    }
+
+    function expandedSelection() {
+      const ids = new Set(selectedIds);
+      for (const id of selectedIds) {
+        const entry = byId(id);
+        if (entry && entry.groupId) {
+          for (const groupId of groupIds(entry.groupId)) ids.add(groupId);
+        }
+      }
+      return Array.from(ids);
+    }
+
+    function groupIds(groupId) {
+      return state.items.filter((entry) => entry.groupId === groupId).map((entry) => entry.id);
+    }
+
+    function moveItems(ids, dx, dy) {
+      for (const id of ids) {
+        const entry = byId(id);
+        if (entry && !entry.locked) {
+          entry.x += dx;
+          entry.y += dy;
+        }
+      }
+    }
+
+    function snapDelta(ids) {
+      if (!state.options.snap) return { dx: 0, dy: 0, guides: [] };
+      const moving = ids.map(byId).filter(Boolean);
+      const bounds = combinedBounds(moving);
+      if (!bounds) return { dx: 0, dy: 0, guides: [] };
+      const threshold = Math.max(0, state.site.snap || 0);
+      const movingEdgesX = [bounds.left, (bounds.left + bounds.right) / 2, bounds.right];
+      const movingEdgesY = [bounds.top, (bounds.top + bounds.bottom) / 2, bounds.bottom];
+      const staticItems = state.items.filter((entry) => !ids.includes(entry.id));
+      const snapX = [0, state.site.width / 2, state.site.width];
+      const snapY = [0, state.site.height / 2, state.site.height];
+      for (const entry of staticItems) {
+        const b = itemBounds(entry);
+        snapX.push(b.left, (b.left + b.right) / 2, b.right);
+        snapY.push(b.top, (b.top + b.bottom) / 2, b.bottom);
+      }
+      let bestX = { delta: 0, distance: Infinity, value: null };
+      let bestY = { delta: 0, distance: Infinity, value: null };
+      for (const edge of movingEdgesX) {
+        for (const target of snapX) {
+          const distance = Math.abs(target - edge);
+          if (distance <= threshold && distance < bestX.distance) {
+            bestX = { delta: target - edge, distance, value: target };
+          }
+        }
+      }
+      for (const edge of movingEdgesY) {
+        for (const target of snapY) {
+          const distance = Math.abs(target - edge);
+          if (distance <= threshold && distance < bestY.distance) {
+            bestY = { delta: target - edge, distance, value: target };
+          }
+        }
+      }
+      const guides = [];
+      if (bestX.value !== null) guides.push({ axis: "x", value: bestX.value });
+      if (bestY.value !== null) guides.push({ axis: "y", value: bestY.value });
+      return { dx: bestX.delta, dy: bestY.delta, guides };
+    }
+
+    function applySelection(nextIds, append) {
+      if (append) {
+        const set = new Set(selectedIds);
+        for (const id of nextIds) {
+          if (set.has(id)) set.delete(id);
+          else set.add(id);
+        }
+        selectedIds = Array.from(set);
+      } else {
+        selectedIds = nextIds;
+      }
+      renderPanels();
+      draw();
+    }
+
+    function addFromTemplate(template) {
+      if (template.constraintId) {
+        const existing = byConstraintId(template.constraintId);
+        if (existing) {
+          applySelection([existing.id], false);
+          centerOnSelection();
+          return;
+        }
+      }
+      const bounds = visibleWorldBounds();
+      const laneOffset = Number(state.site.serviceLaneWidth || 0);
+      const x = Math.max(0, Math.min(state.site.width - template.width, Math.max(laneOffset + 4, Math.max(0, bounds.left) + 12)));
+      const y = Math.max(0, Math.min(state.site.height - template.height, Math.max(0, bounds.top) + 12));
+      const id = template.constraintId || uniqueId(template.type);
+      const entry = item(
+        id,
+        template.label,
+        template.type,
+        template.shape,
+        roundHalf(x),
+        roundHalf(y),
+        template.width,
+        template.height,
+        0,
+        template.color,
+        Boolean(template.keepout),
+        template.notes || ""
+      );
+      if (template.constraintId) entry.constraintId = template.constraintId;
+      state.items.push(entry);
+      applySelection([entry.id], false);
+      renderPalette();
+      saveSoon();
+    }
+
+    function byConstraintId(constraintId) {
+      return state.items.find((entry) => entry.constraintId === constraintId);
+    }
+
+    function loadConstraintVehicles() {
+      const selected = [];
+      for (const template of constrainedVehicleTemplates) {
+        const existing = state.items.find((entry) => entry.constraintId === template.constraintId);
+        if (existing) {
+          selected.push(existing.id);
+          continue;
+        }
+        const entry = item(
+          template.constraintId,
+          template.label,
+          template.type,
+          template.shape,
+          template.x,
+          template.y,
+          template.width,
+          template.height,
+          0,
+          template.color,
+          false,
+          template.notes || ""
+        );
+        entry.constraintId = template.constraintId;
+        state.items.push(entry);
+        selected.push(entry.id);
+      }
+      applySelection(selected, false);
+      renderPalette();
+      saveSoon();
+    }
+
+    function visibleWorldBounds() {
+      const rect = canvas.getBoundingClientRect();
+      const a = screenToWorld({ x: 0, y: 0 });
+      const b = screenToWorld({ x: rect.width, y: rect.height });
+      return { left: a.x, top: a.y, right: b.x, bottom: b.y };
+    }
+
+    function roundHalf(value) {
+      return Math.round(value * 2) / 2;
+    }
+
+    function duplicateSelection() {
+      const ids = expandedSelection();
+      if (!ids.length) return;
+      const newIds = [];
+      const groupMap = new Map();
+      for (const id of ids) {
+        const source = byId(id);
+        if (!source) continue;
+        const copy = cloneLayout(source);
+        copy.id = uniqueId(source.type);
+        copy.label = nextCopyLabel(source.label);
+        copy.x += 4;
+        copy.y += 4;
+        if (copy.groupId) {
+          if (!groupMap.has(copy.groupId)) groupMap.set(copy.groupId, uniqueId("group"));
+          copy.groupId = groupMap.get(copy.groupId);
+        }
+        state.items.push(copy);
+        newIds.push(copy.id);
+      }
+      for (const [oldGroup, newGroup] of groupMap.entries()) {
+        const sourceGroup = state.groups.find((group) => group.id === oldGroup);
+        state.groups.push({
+          id: newGroup,
+          label: sourceGroup ? `${sourceGroup.label} copy` : "Group copy",
+          itemIds: state.items.filter((entry) => entry.groupId === newGroup).map((entry) => entry.id)
+        });
+      }
+      applySelection(newIds, false);
+      saveSoon();
+    }
+
+    function nextCopyLabel(label) {
+      const match = label.match(/^(.*) copy(?: (\d+))?$/);
+      if (!match) return `${label} copy`;
+      const base = match[1];
+      const count = Number(match[2] || 1) + 1;
+      return `${base} copy ${count}`;
+    }
+
+    function groupSelection() {
+      const ids = selectedIds.filter((id) => byId(id));
+      if (ids.length < 2) return;
+      const groupId = uniqueId("group");
+      const label = `Group ${state.groups.length + 1}`;
+      for (const id of ids) {
+        const entry = byId(id);
+        entry.groupId = groupId;
+      }
+      state.groups.push({ id: groupId, label, itemIds: ids.slice() });
+      normalizeGroups();
+      renderPanels();
+      saveSoon();
+      draw();
+    }
+
+    function ungroupSelection() {
+      const groupSet = new Set();
+      for (const id of selectedIds) {
+        const entry = byId(id);
+        if (entry && entry.groupId) groupSet.add(entry.groupId);
+      }
+      if (!groupSet.size) return;
+      for (const entry of state.items) {
+        if (groupSet.has(entry.groupId)) entry.groupId = null;
+      }
+      normalizeGroups();
+      renderPanels();
+      saveSoon();
+      draw();
+    }
+
+    function deleteSelection() {
+      const ids = new Set(expandedSelection());
+      if (!ids.size) return;
+      state.items = state.items.filter((entry) => !ids.has(entry.id) || entry.locked);
+      normalizeGroups();
+      selectedIds = selectedIds.filter((id) => byId(id));
+      renderPalette();
+      renderPanels();
+      saveSoon();
+      draw();
+    }
+
+    function normalizeGroups() {
+      for (const group of state.groups) {
+        group.itemIds = state.items.filter((entry) => entry.groupId === group.id).map((entry) => entry.id);
+      }
+      const validIds = new Set(state.groups.filter((group) => group.itemIds.length > 1).map((group) => group.id));
+      state.groups = state.groups.filter((group) => validIds.has(group.id));
+      for (const entry of state.items) {
+        if (entry.groupId && !validIds.has(entry.groupId)) entry.groupId = null;
+      }
+    }
+
+    function renderPalette() {
+      renderPaletteInto(els.palette, palette);
+      renderPaletteInto(els.constraintPalette, constrainedVehicleTemplates);
+    }
+
+    function renderPaletteInto(container, templates) {
+      container.innerHTML = "";
+      for (const template of templates) {
+        const button = document.createElement("button");
+        button.type = "button";
+        const loaded = template.constraintId && byConstraintId(template.constraintId);
+        button.innerHTML = `
+          <span class="swatch" style="background:${template.color}"></span>
+          <span>${template.label}${loaded ? " (loaded)" : ""}</span>
+          <span class="dims">${template.width}x${template.height}</span>
+        `;
+        button.addEventListener("click", () => addFromTemplate(template));
+        container.append(button);
+      }
+    }
+
+    function renderPanels() {
+      renderSiteControls();
+      renderSelectionPanel();
+      renderInventory();
+      renderSummary();
+      renderButtonStates();
+    }
+
+    function renderSiteControls() {
+      els.siteWidth.value = state.site.width;
+      els.siteHeight.value = state.site.height;
+      els.gridSize.value = state.site.grid;
+      els.snapSize.value = state.site.snap;
+      document.getElementById("toggleSnap").textContent = state.options.snap ? "Snap On" : "Snap Off";
+      document.getElementById("toggleGrid").textContent = state.options.grid ? "Grid On" : "Grid Off";
+    }
+
+    function renderSelectionPanel() {
+      const selected = selectedIds.map(byId).filter(Boolean);
+      els.selectionPanel.innerHTML = "";
+      if (selected.length !== 1) {
+        const div = document.createElement("div");
+        div.className = "selected-empty";
+        div.textContent = selected.length ? `${selected.length} items selected. Use duplicate, group, ungroup, or delete from the toolbar.` : "Select an item on the layout or add one from the palette.";
+        els.selectionPanel.append(div);
+        return;
+      }
+      const entry = selected[0];
+      const panel = document.createElement("div");
+      panel.className = "form-grid";
+      panel.innerHTML = `
+        <label class="full">Label<input data-field="label" value="${escapeAttr(entry.label)}"></label>
+        <label>Type
+          <select data-field="type">
+            ${["vehicle", "shade", "kitchen", "tent", "fuel", "water", "keepout", "other"].map((type) => `<option value="${type}" ${type === entry.type ? "selected" : ""}>${title(type)}</option>`).join("")}
+          </select>
+        </label>
+        <label>Shape
+          <select data-field="shape">
+            <option value="rect" ${entry.shape === "rect" ? "selected" : ""}>Rectangle</option>
+            <option value="ellipse" ${entry.shape === "ellipse" ? "selected" : ""}>Ellipse</option>
+          </select>
+        </label>
+        <label>X ft<input data-field="x" type="number" step="0.5" value="${entry.x}"></label>
+        <label>Y ft<input data-field="y" type="number" step="0.5" value="${entry.y}"></label>
+        <label>Width ft<input data-field="width" type="number" min="1" step="0.5" value="${entry.width}"></label>
+        <label>Depth ft<input data-field="height" type="number" min="1" step="0.5" value="${entry.height}"></label>
+        <label>Rotation deg<input data-field="rotation" type="number" step="15" value="${entry.rotation || 0}"></label>
+        <label>Color<input data-field="color" type="color" value="${entry.color}"></label>
+        <div class="rotation-controls full">
+          <button type="button" data-rotate="-90">-90</button>
+          <button type="button" data-rotate="90">+90</button>
+          <button type="button" data-rotate="-5">-5</button>
+          <button type="button" data-rotate="5">+5</button>
+        </div>
+        <label class="full"><span class="check-row"><input data-field="keepout" type="checkbox" ${entry.keepout ? "checked" : ""}> Keepout / access zone</span></label>
+        <label class="full"><span class="check-row"><input data-field="locked" type="checkbox" ${entry.locked ? "checked" : ""}> Locked</span></label>
+        <label class="full">Notes<textarea data-field="notes">${escapeText(entry.notes || "")}</textarea></label>
+      `;
+      panel.addEventListener("input", (event) => updateSelectedField(event.target));
+      panel.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-rotate]");
+        if (button) rotateSelection(Number(button.dataset.rotate));
+      });
+      els.selectionPanel.append(panel);
+      if (entry.groupId) {
+        const group = state.groups.find((candidate) => candidate.id === entry.groupId);
+        const detail = document.createElement("p");
+        detail.className = "subtle";
+        detail.style.marginTop = "8px";
+        detail.textContent = `Grouped: ${group ? group.label : entry.groupId}`;
+        els.selectionPanel.append(detail);
+      }
+    }
+
+    function rotateSelection(delta) {
+      const ids = expandedSelection();
+      for (const id of ids) {
+        const entry = byId(id);
+        if (entry && !entry.locked) {
+          entry.rotation = normalizeRotation((Number(entry.rotation) || 0) + delta);
+        }
+      }
+      renderPanels();
+      saveSoon();
+      draw();
+    }
+
+    function normalizeRotation(value) {
+      const normalized = value % 360;
+      return normalized < 0 ? normalized + 360 : normalized;
+    }
+
+    function updateSelectedField(input) {
+      const field = input.dataset.field;
+      if (!field || selectedIds.length !== 1) return;
+      const entry = byId(selectedIds[0]);
+      if (!entry) return;
+      if (input.type === "checkbox") {
+        entry[field] = input.checked;
+      } else if (["x", "y", "width", "height", "rotation"].includes(field)) {
+        entry[field] = Number(input.value);
+      } else {
+        entry[field] = input.value;
+      }
+      renderInventory();
+      renderSummary();
+      saveSoon();
+      draw();
+    }
+
+    function renderInventory() {
+      els.inventory.innerHTML = "";
+      const counts = new Map();
+      for (const entry of state.items) {
+        const key = `${entry.label}|${entry.type}|${entry.width}|${entry.height}`;
+        const current = counts.get(key) || { ...entry, qty: 0 };
+        current.qty += 1;
+        counts.set(key, current);
+      }
+      const rows = Array.from(counts.values()).sort((a, b) => a.type.localeCompare(b.type) || a.label.localeCompare(b.label));
+      for (const entry of rows) {
+        const row = document.createElement("div");
+        row.className = `inventory-row ${selectedIds.includes(entry.id) ? "active" : ""}`;
+        row.innerHTML = `
+          <span class="inventory-name"><span class="swatch" style="background:${entry.color}"></span><span>${escapeText(entry.label)}</span></span>
+          <span>${title(entry.type)}</span>
+          <span>${entry.width}x${entry.height}</span>
+          <span>${entry.qty}</span>
+        `;
+        row.addEventListener("click", () => {
+          const matching = state.items
+            .filter((candidate) => candidate.label === entry.label && candidate.type === entry.type && candidate.width === entry.width && candidate.height === entry.height)
+            .map((candidate) => candidate.id);
+          applySelection(matching, false);
+          centerOnSelection();
+        });
+        els.inventory.append(row);
+      }
+    }
+
+    function renderSummary() {
+      const totalArea = state.items.reduce((sum, entry) => sum + entry.width * entry.height, 0);
+      const keepoutArea = state.items.filter((entry) => entry.keepout).reduce((sum, entry) => sum + entry.width * entry.height, 0);
+      const types = new Set(state.items.map((entry) => entry.type));
+      els.summary.innerHTML = `
+        <div class="metric"><strong>${state.items.length}</strong><span>Total items</span></div>
+        <div class="metric"><strong>${types.size}</strong><span>Types</span></div>
+        <div class="metric"><strong>${Math.round(totalArea)}</strong><span>Item sq ft</span></div>
+        <div class="metric"><strong>${Math.round(keepoutArea)}</strong><span>Keepout sq ft</span></div>
+      `;
+    }
+
+    function renderButtonStates() {
+      const hasSelection = selectedIds.length > 0;
+      document.getElementById("duplicate").disabled = !hasSelection;
+      document.getElementById("delete").disabled = !hasSelection;
+      document.getElementById("group").disabled = selectedIds.length < 2;
+      document.getElementById("ungroup").disabled = !selectedIds.some((id) => byId(id) && byId(id).groupId);
+    }
+
+    function updateStatus() {
+      const selected = selectedIds.map(byId).filter(Boolean);
+      const scale = state.view.scale.toFixed(1);
+      if (selected.length === 1) {
+        const entry = selected[0];
+        els.viewStatus.textContent = `${entry.label}: ${entry.x.toFixed(1)}, ${entry.y.toFixed(1)} ft at ${scale}px/ft`;
+      } else if (selected.length > 1) {
+        els.viewStatus.textContent = `${selected.length} items selected at ${scale}px/ft`;
+      } else {
+        els.viewStatus.textContent = `Pan with blank drag, zoom with wheel, ${scale}px/ft`;
+      }
+    }
+
+    function centerOnSelection() {
+      const selected = selectedIds.map(byId).filter(Boolean);
+      const bounds = combinedBounds(selected);
+      if (!bounds) return;
+      const rect = canvas.getBoundingClientRect();
+      const cx = (bounds.left + bounds.right) / 2;
+      const cy = (bounds.top + bounds.bottom) / 2;
+      state.view.x = rect.width / 2 - cx * state.view.scale;
+      state.view.y = rect.height / 2 - cy * state.view.scale;
+      saveSoon();
+      draw();
+    }
+
+    function escapeText(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    function escapeAttr(value) {
+      return escapeText(value);
+    }
+
+    function title(value) {
+      return String(value).slice(0, 1).toUpperCase() + String(value).slice(1);
+    }
+
+    function exportJson() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `camp-layout-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importJsonFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          applyImportedLayout(parsed);
+        } catch (error) {
+          alert(`Could not import JSON: ${error.message}`);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function applyImportedLayout(layout) {
+      if (!layout.site || !Array.isArray(layout.items)) throw new Error("Missing site or items.");
+      state = normalizeLayout(layout);
+      state.view = state.view || { x: 0, y: 0, scale: 5 };
+      selectedIds = [];
+      renderPalette();
+      renderPanels();
+      fitView();
+      saveSoon();
+    }
+
+    async function loadLayoutFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const layoutPath = params.get("layout");
+      const hashMatch = window.location.hash.match(/^#layout=(.+)$/);
+      try {
+        if (layoutPath) {
+          const response = await fetch(layoutPath);
+          if (!response.ok) throw new Error(`Could not load ${layoutPath}`);
+          applyImportedLayout(await response.json());
+        } else if (hashMatch) {
+          applyImportedLayout(decodeLayoutHash(hashMatch[1]));
+        }
+      } catch (error) {
+        alert(`Could not load linked layout: ${error.message}`);
+      }
+    }
+
+    async function copyLayoutLink() {
+      const encoded = encodeLayoutHash(state);
+      const url = `${window.location.origin}${window.location.pathname}#layout=${encoded}`;
+      if (url.length > 18000) {
+        alert("This layout link is getting large. Export JSON and share that file, or commit it under layouts/ and use ?layout=layouts/name.json.");
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(url);
+        els.saveStatus.textContent = "Layout link copied";
+      } catch (error) {
+        window.prompt("Copy this layout link:", url);
+      }
+    }
+
+    function encodeLayoutHash(layout) {
+      const json = encodeURIComponent(JSON.stringify(layout));
+      return btoa(json).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    }
+
+    function decodeLayoutHash(encoded) {
+      const base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
+      const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+      return JSON.parse(decodeURIComponent(atob(padded)));
+    }
+
+    function preparePrint() {
+      const image = renderPrintImage();
+      const rows = state.items
+        .slice()
+        .sort((a, b) => a.type.localeCompare(b.type) || a.label.localeCompare(b.label))
+        .map((entry) => `
+          <tr>
+            <td>${escapeText(entry.label)}</td>
+            <td>${title(entry.type)}</td>
+            <td>${entry.width} x ${entry.height} ft</td>
+            <td>${entry.rotation || 0} deg</td>
+            <td>${entry.keepout ? "Yes" : ""}</td>
+            <td>${escapeText(entry.notes || "")}</td>
+          </tr>
+        `).join("");
+      els.printSheet.innerHTML = `
+        <h1>Camp Layout</h1>
+        <div class="print-meta">${state.placement.address}. ${state.site.width} x ${state.site.height} ft site. ${state.placement.frontageFacing}. ${state.site.serviceLaneWidth} ft service lane. Exported ${new Date().toLocaleString()}.</div>
+        <img class="print-layout" src="${image}" alt="Camp layout">
+        <div class="print-grid">
+          <div>
+            <h2>Inventory</h2>
+            <table class="print-table">
+              <thead><tr><th>Label</th><th>Type</th><th>Size</th><th>Rot</th><th>Keepout</th><th>Notes</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+          <div>
+            <h2>Groups</h2>
+            <table class="print-table">
+              <thead><tr><th>Group</th><th>Items</th></tr></thead>
+              <tbody>${state.groups.map((group) => `<tr><td>${escapeText(group.label)}</td><td>${group.itemIds.map((id) => byId(id)).filter(Boolean).map((entry) => escapeText(entry.label)).join(", ")}</td></tr>`).join("") || "<tr><td>None</td><td></td></tr>"}</tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPrintImage() {
+      const width = 1400;
+      const height = Math.round(width * state.site.height / state.site.width);
+      const offscreen = document.createElement("canvas");
+      offscreen.width = width;
+      offscreen.height = height;
+      const pctx = offscreen.getContext("2d");
+      const scale = width / state.site.width;
+      pctx.fillStyle = "#ffffff";
+      pctx.fillRect(0, 0, width, height);
+      pctx.strokeStyle = "#222222";
+      pctx.lineWidth = 2;
+      pctx.strokeRect(0, 0, width, height);
+      pctx.strokeStyle = "#e5e5e5";
+      pctx.lineWidth = 1;
+      const grid = Math.max(1, state.site.grid || 5);
+      for (let x = grid; x < state.site.width; x += grid) {
+        pctx.beginPath();
+        pctx.moveTo(x * scale, 0);
+        pctx.lineTo(x * scale, height);
+        pctx.stroke();
+      }
+      for (let y = grid; y < state.site.height; y += grid) {
+        pctx.beginPath();
+        pctx.moveTo(0, y * scale);
+        pctx.lineTo(width, y * scale);
+        pctx.stroke();
+      }
+      for (const entry of state.items) {
+        const cx = (entry.x + entry.width / 2) * scale;
+        const cy = (entry.y + entry.height / 2) * scale;
+        const w = entry.width * scale;
+        const h = entry.height * scale;
+        pctx.save();
+        pctx.translate(cx, cy);
+        pctx.rotate((entry.rotation || 0) * Math.PI / 180);
+        pctx.fillStyle = entry.color;
+        pctx.strokeStyle = shade(entry.color, -35);
+        pctx.lineWidth = 2;
+        if (entry.shape === "ellipse") {
+          pctx.beginPath();
+          pctx.ellipse(0, 0, w / 2, h / 2, 0, 0, Math.PI * 2);
+          pctx.globalAlpha = itemFillAlpha(entry);
+          pctx.fill();
+          pctx.globalAlpha = 1;
+          pctx.stroke();
+        } else {
+          pctx.globalAlpha = itemFillAlpha(entry);
+          pctx.fillRect(-w / 2, -h / 2, w, h);
+          pctx.globalAlpha = 1;
+          pctx.strokeRect(-w / 2, -h / 2, w, h);
+        }
+        pctx.fillStyle = readableTextColor(entry.color);
+        pctx.font = "18px Arial, sans-serif";
+        pctx.textAlign = "center";
+        pctx.textBaseline = "middle";
+        pctx.fillText(entry.label, 0, -5, Math.max(30, w - 12));
+        pctx.font = "13px Arial, sans-serif";
+        pctx.fillText(`${entry.width}x${entry.height}`, 0, 15);
+        pctx.restore();
+      }
+      drawPrintOrientation(pctx, width, height);
+      return offscreen.toDataURL("image/png");
+    }
+
+    function drawPrintOrientation(pctx, width, height) {
+      const midX = width / 2;
+      pctx.save();
+      pctx.font = "18px Arial, sans-serif";
+      pctx.textAlign = "center";
+      pctx.textBaseline = "middle";
+      drawArrow(pctx, midX, height - 66, midX, height - 28, "#6f7f8f");
+      printBadge(pctx, "Street / mountains", midX, height - 84);
+      drawArrow(pctx, midX, 72, midX, 30, "#506fa8");
+      printBadge(pctx, "The Man", midX, 94);
+      drawArrow(pctx, 54, 46, width - 54, 46, "#b1842e");
+      printBadge(pctx, "Sun path E -> W", midX, 46);
+      printBadge(pctx, `${state.placement.address} frontage: ${state.placement.frontageFacing}`, midX, height - 28);
+      pctx.restore();
+    }
+
+    function printBadge(pctx, text, x, y) {
+      const width = pctx.measureText(text).width + 20;
+      pctx.fillStyle = "#ffffff";
+      pctx.strokeStyle = "#bbbbbb";
+      pctx.fillRect(x - width / 2, y - 13, width, 26);
+      pctx.strokeRect(x - width / 2, y - 13, width, 26);
+      pctx.fillStyle = "#111111";
+      pctx.fillText(text, x, y);
+    }
+
+    canvas.addEventListener("pointerdown", (event) => {
+      canvas.setPointerCapture(event.pointerId);
+      const point = pointerEventPoint(event);
+      const world = screenToWorld(point);
+      const target = hitTest(world);
+      lastPointer = point;
+      if (target && !target.locked) {
+        const append = event.shiftKey || event.metaKey || event.ctrlKey;
+        if (!selectedIds.includes(target.id) || append) applySelection([target.id], append);
+        const ids = activeDragIds(target);
+        drag = {
+          mode: "move",
+          ids,
+          lastWorld: world,
+          guides: []
+        };
+      } else if (target && target.locked) {
+        applySelection([target.id], event.shiftKey || event.metaKey || event.ctrlKey);
+        drag = null;
+      } else {
+        if (!event.shiftKey && !event.metaKey && !event.ctrlKey) applySelection([], false);
+        drag = { mode: "pan", lastPoint: point, guides: [] };
+      }
+    });
+
+    canvas.addEventListener("pointermove", (event) => {
+      const point = pointerEventPoint(event);
+      const world = screenToWorld(point);
+      if (!drag) {
+        const hover = hitTest(world);
+        canvas.style.cursor = hover ? "move" : "default";
+        return;
+      }
+      if (drag.mode === "move") {
+        const dx = world.x - drag.lastWorld.x;
+        const dy = world.y - drag.lastWorld.y;
+        moveItems(drag.ids, dx, dy);
+        const snap = snapDelta(drag.ids);
+        moveItems(drag.ids, snap.dx, snap.dy);
+        drag.guides = snap.guides;
+        drag.lastWorld = screenToWorld(point);
+        saveSoon();
+        renderPanels();
+        draw();
+      } else if (drag.mode === "pan") {
+        state.view.x += point.x - drag.lastPoint.x;
+        state.view.y += point.y - drag.lastPoint.y;
+        drag.lastPoint = point;
+        saveSoon();
+        draw();
+      }
+      lastPointer = point;
+    });
+
+    canvas.addEventListener("pointerup", () => {
+      drag = null;
+      draw();
+    });
+
+    canvas.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      const point = pointerEventPoint(event);
+      const before = screenToWorld(point);
+      const factor = event.deltaY > 0 ? 0.9 : 1.1;
+      state.view.scale = Math.max(1, Math.min(30, state.view.scale * factor));
+      const after = worldToScreen(before);
+      state.view.x += point.x - after.x;
+      state.view.y += point.y - after.y;
+      saveSoon();
+      draw();
+    }, { passive: false });
+
+    document.getElementById("fitView").addEventListener("click", fitView);
+    document.getElementById("zoomIn").addEventListener("click", () => {
+      state.view.scale = Math.min(30, state.view.scale * 1.15);
+      saveSoon();
+      draw();
+    });
+    document.getElementById("zoomOut").addEventListener("click", () => {
+      state.view.scale = Math.max(1, state.view.scale / 1.15);
+      saveSoon();
+      draw();
+    });
+    document.getElementById("toggleSnap").addEventListener("click", () => {
+      state.options.snap = !state.options.snap;
+      renderPanels();
+      saveSoon();
+      draw();
+    });
+    document.getElementById("toggleGrid").addEventListener("click", () => {
+      state.options.grid = !state.options.grid;
+      renderPanels();
+      saveSoon();
+      draw();
+    });
+    document.getElementById("selectAll").addEventListener("click", () => applySelection(state.items.map((entry) => entry.id), false));
+    document.getElementById("loadConstraintVehicles").addEventListener("click", loadConstraintVehicles);
+    document.getElementById("duplicate").addEventListener("click", duplicateSelection);
+    document.getElementById("group").addEventListener("click", groupSelection);
+    document.getElementById("ungroup").addEventListener("click", ungroupSelection);
+    document.getElementById("delete").addEventListener("click", deleteSelection);
+    document.getElementById("exportJson").addEventListener("click", exportJson);
+    document.getElementById("copyLayoutLink").addEventListener("click", copyLayoutLink);
+    document.getElementById("importJson").addEventListener("click", () => document.getElementById("importFile").click());
+    document.getElementById("importFile").addEventListener("change", (event) => importJsonFile(event.target.files[0]));
+    document.getElementById("printPdf").addEventListener("click", () => {
+      preparePrint();
+      window.print();
+    });
+    document.getElementById("resetDemo").addEventListener("click", () => {
+      state = loadStateFromDemo();
+      selectedIds = [];
+      renderPalette();
+      renderPanels();
+      fitView();
+      saveSoon();
+    });
+    document.getElementById("addCustom").addEventListener("click", () => {
+      const template = {
+        label: document.getElementById("newLabel").value || "Custom shape",
+        type: document.getElementById("newType").value,
+        shape: document.getElementById("newShape").value,
+        width: Number(document.getElementById("newWidth").value || 10),
+        height: Number(document.getElementById("newHeight").value || 10),
+        color: document.getElementById("newColor").value,
+        keepout: document.getElementById("newKeepout").checked
+      };
+      addFromTemplate(template);
+    });
+
+    for (const input of [els.siteWidth, els.siteHeight, els.gridSize, els.snapSize]) {
+      input.addEventListener("input", () => {
+        state.site.width = SITE_DEFAULTS.width;
+        state.site.height = SITE_DEFAULTS.height;
+        state.site.grid = Number(els.gridSize.value || state.site.grid);
+        state.site.snap = Number(els.snapSize.value || state.site.snap);
+        ensureServiceLane(state);
+        saveSoon();
+        draw();
+      });
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+
+    function loadStateFromDemo() {
+      const layout = cloneLayout(demoLayout);
+      for (const group of layout.groups) {
+        for (const id of group.itemIds) {
+          const found = layout.items.find((entry) => entry.id === id);
+          if (found) found.groupId = group.id;
+        }
+      }
+      return normalizeLayout(layout);
+    }
+
+    renderPalette();
+    renderPanels();
+    resizeCanvas();
+    requestAnimationFrame(fitView);
+    loadLayoutFromUrl();
+  </script>
+</body>
+</html>

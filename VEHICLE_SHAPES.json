@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "units": "feet",
+  "source": "VEHICLE_CONSTRAINTS.md",
+  "notes": "Shapes use conservative placeholder widths where raw notes only provided length. Update dimensions as owners confirm details.",
+  "shapes": [
+    {
+      "constraintId": "vehicle-loren-rommel",
+      "label": "Loren Tacoma + trailer",
+      "owner": "Loren Rommel",
+      "type": "vehicle",
+      "shape": "rect",
+      "width": 34,
+      "height": 8,
+      "color": "#5f6f83",
+      "notes": "Toyota Tacoma 18 ft plus 16 ft trailer, modeled as combined 34 ft x 8 ft placeholder. Confirm width and whether truck/trailer can detach."
+    },
+    {
+      "constraintId": "vehicle-ash-sprinter",
+      "label": "Ash Sprinter",
+      "owner": "Ash",
+      "type": "vehicle",
+      "shape": "rect",
+      "width": 20,
+      "height": 8,
+      "color": "#5377b0",
+      "notes": "20 ft Sprinter van. Width TBD; modeled as 8 ft until confirmed."
+    },
+    {
+      "constraintId": "vehicle-ryan-sprinter-carport",
+      "label": "Ryan van + carport",
+      "owner": "Ryan",
+      "type": "vehicle",
+      "shape": "rect",
+      "width": 20,
+      "height": 20,
+      "color": "#597ca8",
+      "notes": "Sprinter van and carport kept together as a 20 ft x 20 ft compound footprint. Confirm carport orientation and door-side clearance."
+    },
+    {
+      "constraintId": "vehicle-aidan-camper-van",
+      "label": "Aidan camper van",
+      "owner": "Aidan",
+      "type": "vehicle",
+      "shape": "rect",
+      "width": 22,
+      "height": 8,
+      "color": "#5377b0",
+      "notes": "22 ft camper van. Width TBD; modeled as 8 ft until confirmed."
+    },
+    {
+      "constraintId": "vehicle-jeb-rissa-solar",
+      "label": "Jeb/Rissa solar zone",
+      "owner": "Jeb and Rissa",
+      "type": "other",
+      "shape": "rect",
+      "width": 12,
+      "height": 12,
+      "color": "#c6a33a",
+      "notes": "12 ft x 12 ft south-facing lower-shade footprint. Needs clear sun exposure for solar panels. Confirm whether this is vehicle, trailer, or standalone solar setup."
+    },
+    {
+      "constraintId": "vehicle-alice-rv",
+      "label": "Alice RV",
+      "owner": "Alice",
+      "type": "vehicle",
+      "shape": "rect",
+      "width": 30,
+      "height": 10,
+      "color": "#7d7188",
+      "notes": "30 ft RV. Width, slide-outs, awning, door side, and access needs TBD; modeled as 30 ft x 10 ft placeholder."
+    },
+    {
+      "constraintId": "vehicle-eyal-trailer",
+      "label": "Eyal trailer",
+      "owner": "Eyal",
+      "type": "vehicle",
+      "shape": "rect",
+      "width": 12,
+      "height": 8,
+      "color": "#7b697c",
+      "notes": "12 ft trailer. Width, tow vehicle, detach status, and sleeping use TBD."
+    },
+    {
+      "constraintId": "vehicle-team-box-truck",
+      "label": "Team box truck",
+      "owner": "Team",
+      "type": "vehicle",
+      "shape": "rect",
+      "width": 35,
+      "height": 9,
+      "color": "#48586b",
+      "notes": "35 ft box truck. Width and loading-door access side TBD; consider edge placement and storage/kitchen access."
+    },
+    {
+      "constraintId": "vehicle-team-cargo-trailer",
+      "label": "Team cargo trailer + stairs",
+      "owner": "Team",
+      "type": "vehicle",
+      "shape": "rect",
+      "width": 45,
+      "height": 15,
+      "color": "#6c5f73",
+      "notes": "45 ft x 9 ft cargo trailer plus 6 ft stair/access allowance, modeled as 45 ft x 15 ft effective footprint. Confirm stair side and access geometry."
+    }
+  ]
+}
