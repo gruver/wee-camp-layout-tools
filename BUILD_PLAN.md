@@ -32,7 +32,7 @@ The layout state is plain JSON:
 - `placement`: address and orientation metadata such as frontage, mountain
   direction, Man direction, and sun path.
 - `items`: every placed object, including geometry, position, rotation, label,
-  type, color, keepout status, lock status, group membership, and notes.
+  type, layer, color, keepout status, lock status, group membership, and notes.
 - `groups`: logical clusters of item IDs that should move together.
 - `options`: user-facing display and editing toggles.
 - `view`: current canvas pan and zoom.
@@ -56,6 +56,11 @@ Center workspace:
 - Scaled 2D canvas.
 - Site boundary, grid, service lane, placed objects, keepout zones, snap guides,
   and orientation labels.
+- Layered rendering, starting with `ground`, `infrastructure`, and `shade`.
+  Ground is for zones such as service lanes, access keepouts, and parking
+  circles. Infrastructure is for cars, tents, trailers, racks, generators, and
+  camp objects. Shade is the top layer and remains translucent.
+- Display toggles for large sun-path and afternoon-wind overlays.
 - Toolbar for selection actions, grouping, deletion, zoom, grid, and snap.
 - Bottom status readout for current view and selected object position.
 

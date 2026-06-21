@@ -43,15 +43,22 @@ https://YOUR_USER.github.io/wee_camp_layout_tools/?layout=layouts/draft-1.json
   remain visible underneath them.
 - Draws orientation labels for street/mountains, The Man, and east-to-west sun
   travel on the canvas and PDF export.
+- Draws the typical afternoon wind vector from southwest toward northeast for
+  dust, kitchen, fuel, and shade planning.
+- Sun and wind overlays can be toggled on/off while editing so they do not
+  obscure placed objects.
 - Drag, pan, and zoom a scaled 2D site plan.
 - Add predefined camp objects from a generic camp-pieces palette.
 - Add 2026-specific constraint objects from a separate constraint-object
   palette.
 - Generic camp pieces include common vehicles, bike racks, generator areas,
-  Elephant Mutant Vehicle parking, shade, tents, kitchen, fuel, water, and
-  keepout objects.
+  fire rings, Elephant Mutant Vehicle parking, shade, tents, kitchen, fuel,
+  water, and keepout objects.
 - Edit label, type, dimensions, position, rotation, color, notes, lock state,
   and keepout/access-zone status.
+- Assign objects to named layers. The current layers are `ground`,
+  `infrastructure`, and `shade`; ground draws first, infrastructure draws next,
+  and shade draws above it translucently.
 - Rotate selected objects in 90 degree increments or fine 5 degree increments.
 - Duplicate repeated shapes such as tents or shade tarps.
 - Group and ungroup selected objects.

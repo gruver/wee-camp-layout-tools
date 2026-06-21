@@ -634,6 +634,8 @@
         <button id="zoomIn">+</button>
         <button id="toggleSnap">Snap On</button>
         <button id="toggleGrid">Grid On</button>
+        <button id="toggleSun">Sun On</button>
+        <button id="toggleWind">Wind On</button>
       </div>
     </div>
     <div class="canvas-wrap">
@@ -679,8 +681,10 @@
       frontageDescription: "Street frontage / front yard",
       manDirection: "Back of camp",
       mountainDirection: "Street frontage",
-      sunPath: "East to west across the plan"
+      sunPath: "East to west across the plan",
+      afternoonWind: "Typical afternoon wind SW -> NE"
     };
+    const LAYERS = ["ground", "infrastructure", "shade"];
 
     const palette = [
       { label: "Black Rock shade", type: "shade", shape: "rect", width: 12, height: 20, color: "#d8a742" },
@@ -696,11 +700,12 @@
       { label: "Trailer", type: "vehicle", shape: "rect", width: 18, height: 8, color: "#7b697c" },
       { label: "Bike rack", type: "other", shape: "rect", width: 3, height: 6, color: "#4f8f7b", notes: "Bike rack footprint." },
       { label: "Generator area", type: "other", shape: "rect", width: 6, height: 6, color: "#9f7c3a", keepout: true, notes: "Generator footprint and immediate keep-clear area." },
+      { label: "Fire ring", type: "other", shape: "ellipse", width: 15, height: 15, color: "#c65f3f", keepout: true, layer: "ground", notes: "15 ft diameter fire ring safety zone. Actual fire pit is 24 in x 30 in at center; chairs can be inside the ring, but keep other items away." },
       { label: "Kitchen zone", type: "kitchen", shape: "rect", width: 24, height: 16, color: "#bd7a45" },
       { label: "Fuel storage", type: "fuel", shape: "rect", width: 8, height: 8, color: "#bd5942", keepout: true },
-      { label: "Water tank keepout", type: "water", shape: "rect", width: 18, height: 14, color: "#3b8d9b", keepout: true },
+      { label: "Water tank keepout", type: "water", shape: "rect", width: 18, height: 14, color: "#3b8d9b", keepout: true, layer: "ground" },
       { label: "Round dome", type: "shade", shape: "ellipse", width: 24, height: 24, color: "#7c7fb3" },
-      { label: "Elephant MV parking", type: "other", shape: "ellipse", width: 40, height: 40, color: "#4f9f5f", notes: "40 ft diameter parking zone for Elephant Mutant Vehicle." }
+      { label: "Elephant MV parking", type: "other", shape: "ellipse", width: 40, height: 40, color: "#4f9f5f", layer: "ground", notes: "40 ft diameter parking zone for Elephant Mutant Vehicle." }
     ];
 
     const constrainedVehicleTemplates = [
@@ -820,7 +825,7 @@
       site: { width: 150, height: 150, grid: 5, snap: 2, serviceLaneWidth: 20, fixed: true },
       placement: { ...PLACEMENT_DEFAULTS },
       view: { x: 0, y: 0, scale: 5 },
-      options: { snap: true, grid: true },
+      options: { snap: true, grid: true, showSun: true, showWind: true },
       groups: [
         { id: "group-kitchen", label: "Kitchen cluster", itemIds: ["kitchen-1", "shade-2"] }
       ],
@@ -879,9 +884,21 @@
         color,
         keepout,
         locked,
+        layer: defaultLayerForItem({ label, type, keepout }),
         groupId: null,
         notes: notes || ""
       };
+    }
+
+    function defaultLayerForType(type) {
+      return defaultLayerForItem({ type });
+    }
+
+    function defaultLayerForItem(entry) {
+      if (entry.type === "shade") return "shade";
+      if (entry.type === "keepout" || entry.type === "water") return "ground";
+      if (/parking|lane|access|keepout/i.test(entry.label || "")) return "ground";
+      return "infrastructure";
     }
 
     function cloneLayout(layout) {
@@ -909,7 +926,8 @@
     }
 
     function normalizeLayout(layout) {
-      layout.version = Math.max(2, Number(layout.version || 1));
+      const previousVersion = Number(layout.version || 1);
+      layout.version = Math.max(3, previousVersion);
       layout.units = "feet";
       layout.site = {
         ...layout.site,
@@ -921,8 +939,13 @@
         fixed: true
       };
       layout.placement = { ...PLACEMENT_DEFAULTS, ...(layout.placement || {}) };
-      layout.options = layout.options || { snap: true, grid: true };
+      layout.options = { snap: true, grid: true, showSun: true, showWind: true, ...(layout.options || {}) };
       layout.groups = layout.groups || [];
+      for (const entry of layout.items) {
+        if (!LAYERS.includes(entry.layer) || previousVersion < 3 && entry.layer === "ground" && defaultLayerForItem(entry) === "infrastructure") {
+          entry.layer = defaultLayerForItem(entry);
+        }
+      }
       ensureServiceLane(layout);
       return layout;
     }
@@ -1000,11 +1023,17 @@
       drawSite();
       if (state.options.grid) drawGrid();
       drawSnapGuides();
-      const sorted = state.items.slice().sort((a, b) => Number(a.keepout) - Number(b.keepout));
+      const sorted = state.items.slice().sort(compareItemsForDrawing);
       for (const entry of sorted) drawItem(entry);
       drawSelectionOutline();
       drawOrientationOverlay();
       updateStatus();
+    }
+
+    function compareItemsForDrawing(a, b) {
+      const layerDelta = LAYERS.indexOf(a.layer) - LAYERS.indexOf(b.layer);
+      if (layerDelta) return layerDelta;
+      return Number(a.keepout) - Number(b.keepout);
     }
 
     function drawBackground(width, height) {
@@ -1040,8 +1069,16 @@
       drawBadge("Street / mountains", midX, q.y - 56, "#ffffff");
       drawArrow(ctx, midX, p.y + 48, midX, p.y + 18, "#506fa8");
       drawBadge("The Man", midX, p.y + 60, "#ffffff");
-      drawArrow(ctx, p.x + 34, p.y + 30, q.x - 34, p.y + 30, "#b1842e");
-      drawBadge("Sun path E -> W", midX, p.y + 30, "#fffdfa");
+      if (state.options.showSun !== false) {
+        ctx.lineWidth = 3;
+        drawArrow(ctx, p.x + 34, p.y + 30, q.x - 34, p.y + 30, "#b1842e");
+        drawBadge("Sun path E -> W", midX, p.y + 30, "#fffdfa", 16);
+      }
+      if (state.options.showWind !== false) {
+        ctx.lineWidth = 3;
+        drawArrow(ctx, p.x + 40, q.y - 42, q.x - 40, p.y + 76, "#8f6a9d");
+        drawBadge("Afternoon wind SW -> NE", midX, (p.y + q.y) / 2 + 10, "#fffdfa", 16);
+      }
       drawBadge(`${state.placement.address} frontage: ${state.placement.frontageFacing}`, midX, q.y - 18, "#fffdfa");
       ctx.restore();
     }
@@ -1065,16 +1102,18 @@
       targetCtx.restore();
     }
 
-    function drawBadge(text, x, y, fill) {
+    function drawBadge(text, x, y, fill, size = 12) {
       ctx.save();
-      ctx.font = "12px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+      ctx.font = `${size}px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      const width = ctx.measureText(text).width + 14;
+      const padX = size * 0.65;
+      const height = size + 10;
+      const width = ctx.measureText(text).width + padX * 2;
       ctx.fillStyle = fill;
       ctx.strokeStyle = "rgba(32, 33, 36, 0.18)";
-      ctx.fillRect(x - width / 2, y - 10, width, 20);
-      ctx.strokeRect(x - width / 2, y - 10, width, 20);
+      ctx.fillRect(x - width / 2, y - height / 2, width, height);
+      ctx.strokeRect(x - width / 2, y - height / 2, width, height);
       ctx.fillStyle = "#202124";
       ctx.fillText(text, x, y);
       ctx.restore();
@@ -1282,8 +1321,9 @@
     }
 
     function hitTest(world) {
-      for (let i = state.items.length - 1; i >= 0; i -= 1) {
-        const entry = state.items[i];
+      const sorted = state.items.slice().sort(compareItemsForDrawing);
+      for (let i = sorted.length - 1; i >= 0; i -= 1) {
+        const entry = sorted[i];
         const cx = entry.x + entry.width / 2;
         const cy = entry.y + entry.height / 2;
         const angle = -(entry.rotation || 0) * Math.PI / 180;
@@ -1421,6 +1461,7 @@
         Boolean(template.keepout),
         template.notes || ""
       );
+      entry.layer = template.layer || defaultLayerForItem(entry);
       if (template.constraintId) entry.constraintId = template.constraintId;
       state.items.push(entry);
       applySelection([entry.id], false);
@@ -1454,6 +1495,7 @@
           false,
           template.notes || ""
         );
+        entry.layer = template.layer || defaultLayerForItem(entry);
         entry.constraintId = template.constraintId;
         state.items.push(entry);
         selected.push(entry.id);
@@ -1605,6 +1647,8 @@
       els.snapSize.value = state.site.snap;
       document.getElementById("toggleSnap").textContent = state.options.snap ? "Snap On" : "Snap Off";
       document.getElementById("toggleGrid").textContent = state.options.grid ? "Grid On" : "Grid Off";
+      document.getElementById("toggleSun").textContent = state.options.showSun !== false ? "Sun On" : "Sun Off";
+      document.getElementById("toggleWind").textContent = state.options.showWind !== false ? "Wind On" : "Wind Off";
     }
 
     function renderSelectionPanel() {
@@ -1625,6 +1669,11 @@
         <label>Type
           <select data-field="type">
             ${["vehicle", "shade", "kitchen", "tent", "fuel", "water", "keepout", "other"].map((type) => `<option value="${type}" ${type === entry.type ? "selected" : ""}>${title(type)}</option>`).join("")}
+          </select>
+        </label>
+        <label>Layer
+          <select data-field="layer">
+            ${LAYERS.map((layer) => `<option value="${layer}" ${layer === entry.layer ? "selected" : ""}>${title(layer)}</option>`).join("")}
           </select>
         </label>
         <label>Shape
@@ -1694,6 +1743,7 @@
         entry[field] = Number(input.value);
       } else {
         entry[field] = input.value;
+        if (field === "type" && !LAYERS.includes(entry.layer)) entry.layer = defaultLayerForItem(entry);
       }
       renderInventory();
       renderSummary();
@@ -1704,7 +1754,7 @@
     function renderInventory() {
       els.inventory.innerHTML = "";
       const counts = new Map();
-      for (const entry of state.items) {
+      for (const entry of state.items.slice().sort(compareItemsForDrawing)) {
         const key = `${entry.label}|${entry.type}|${entry.width}|${entry.height}`;
         const current = counts.get(key) || { ...entry, qty: 0 };
         current.qty += 1;
@@ -1882,6 +1932,7 @@
           <tr>
             <td>${escapeText(entry.label)}</td>
             <td>${title(entry.type)}</td>
+            <td>${title(entry.layer || defaultLayerForType(entry.type))}</td>
             <td>${entry.width} x ${entry.height} ft</td>
             <td>${entry.rotation || 0} deg</td>
             <td>${entry.keepout ? "Yes" : ""}</td>
@@ -1896,7 +1947,7 @@
           <div>
             <h2>Inventory</h2>
             <table class="print-table">
-              <thead><tr><th>Label</th><th>Type</th><th>Size</th><th>Rot</th><th>Keepout</th><th>Notes</th></tr></thead>
+              <thead><tr><th>Label</th><th>Type</th><th>Layer</th><th>Size</th><th>Rot</th><th>Keepout</th><th>Notes</th></tr></thead>
               <tbody>${rows}</tbody>
             </table>
           </div>
@@ -1986,18 +2037,28 @@
       printBadge(pctx, "Street / mountains", midX, height - 84);
       drawArrow(pctx, midX, 72, midX, 30, "#506fa8");
       printBadge(pctx, "The Man", midX, 94);
-      drawArrow(pctx, 54, 46, width - 54, 46, "#b1842e");
-      printBadge(pctx, "Sun path E -> W", midX, 46);
+      if (state.options.showSun !== false) {
+        pctx.lineWidth = 3;
+        drawArrow(pctx, 54, 46, width - 54, 46, "#b1842e");
+        printBadge(pctx, "Sun path E -> W", midX, 46, 24);
+      }
+      if (state.options.showWind !== false) {
+        pctx.lineWidth = 3;
+        drawArrow(pctx, 72, height - 76, width - 72, 130, "#8f6a9d");
+        printBadge(pctx, "Afternoon wind SW -> NE", midX, height / 2 + 28, 24);
+      }
       printBadge(pctx, `${state.placement.address} frontage: ${state.placement.frontageFacing}`, midX, height - 28);
       pctx.restore();
     }
 
-    function printBadge(pctx, text, x, y) {
-      const width = pctx.measureText(text).width + 20;
+    function printBadge(pctx, text, x, y, size = 18) {
+      pctx.font = `${size}px Arial, sans-serif`;
+      const width = pctx.measureText(text).width + size * 1.2;
+      const height = size + 10;
       pctx.fillStyle = "#ffffff";
       pctx.strokeStyle = "#bbbbbb";
-      pctx.fillRect(x - width / 2, y - 13, width, 26);
-      pctx.strokeRect(x - width / 2, y - 13, width, 26);
+      pctx.fillRect(x - width / 2, y - height / 2, width, height);
+      pctx.strokeRect(x - width / 2, y - height / 2, width, height);
       pctx.fillStyle = "#111111";
       pctx.fillText(text, x, y);
     }
@@ -2093,6 +2154,18 @@
     });
     document.getElementById("toggleGrid").addEventListener("click", () => {
       state.options.grid = !state.options.grid;
+      renderPanels();
+      saveSoon();
+      draw();
+    });
+    document.getElementById("toggleSun").addEventListener("click", () => {
+      state.options.showSun = state.options.showSun === false;
+      renderPanels();
+      saveSoon();
+      draw();
+    });
+    document.getElementById("toggleWind").addEventListener("click", () => {
+      state.options.showWind = state.options.showWind === false;
       renderPanels();
       saveSoon();
       draw();

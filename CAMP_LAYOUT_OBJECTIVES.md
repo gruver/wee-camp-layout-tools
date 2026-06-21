@@ -15,6 +15,8 @@ tradeoffs become clearer.
 - Direction toward The Man: back of camp from the frontage.
 - Direction toward mountains: out through the frontage/street side.
 - Sun path assumption: east to west across the plan.
+- Afternoon wind assumption: typical afternoon winds blow from southwest toward
+  northeast.
 
 ## Placement Directive Summary
 
@@ -82,6 +84,9 @@ Preferred:
 - Frontage/street side faces the mountains.
 - Back of camp points toward The Man.
 - Sun travel is treated as east to west for shade planning.
+- Afternoon winds at Burning Man in the Black Rock Desert usually blow from the
+  southwest toward the northeast. Desert thermal heating often makes these
+  diurnal winds pick up in the afternoon and flow steadily in this direction.
 - Standard shade structures are mostly Black Rock shade modules, assumed to be
   12 ft x 20 ft each.
 - Shade structures should prioritize kitchen, lounge, and high-use daytime
