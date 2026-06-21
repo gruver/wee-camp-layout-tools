@@ -10,13 +10,15 @@
     "fixed": true
   },
   "view": {
-    "x": 30.76893250063867,
-    "y": 75.94433801620255,
-    "scale": 5.896363199904267
+    "x": 63.5,
+    "y": 60,
+    "scale": 5.6866666666666665
   },
   "options": {
     "snap": false,
-    "grid": true
+    "grid": true,
+    "showSun": false,
+    "showWind": false
   },
   "groups": [],
   "items": [
@@ -403,7 +405,7 @@
       "type": "vehicle",
       "shape": "rect",
       "x": 99.02024693167479,
-      "y": 5.617083468407097,
+      "y": 5.637690883412958,
       "width": 15,
       "height": 6,
       "rotation": 315,
@@ -488,8 +490,8 @@
       "label": "Black Rock shade copy 5",
       "type": "shade",
       "shape": "rect",
-      "x": 92.73323857291716,
-      "y": 77.5453401509573,
+      "x": 92.79300007643417,
+      "y": 78.07426380277441,
       "width": 12,
       "height": 20,
       "rotation": 0,
@@ -522,8 +524,8 @@
       "label": "Black Rock shade copy 7",
       "type": "shade",
       "shape": "rect",
-      "x": 105.66803685855858,
-      "y": 77.81130141358844,
+      "x": 105.92631645996538,
+      "y": 78.00844568381119,
       "width": 12,
       "height": 20,
       "rotation": 0,
@@ -574,8 +576,8 @@
       "label": "Jeb/Rissa solar zone",
       "type": "other",
       "shape": "rect",
-      "x": 131.6761147801071,
-      "y": 90.60014438669688,
+      "x": 134.34683576486677,
+      "y": 83.04271839021388,
       "width": 12,
       "height": 12,
       "rotation": 0,
@@ -810,24 +812,6 @@
       "layer": "infrastructure"
     },
     {
-      "id": "vehicle-mqnc0b85",
-      "label": "RV copy",
-      "type": "vehicle",
-      "shape": "rect",
-      "x": 65.4250817866143,
-      "y": 1.4717120374486372,
-      "width": 30,
-      "height": 10,
-      "rotation": 0,
-      "color": "#7d7188",
-      "keepout": false,
-      "locked": false,
-      "layer": "infrastructure",
-      "groupId": null,
-      "notes": "30 ft RV. Width, slide-outs, awning, door side, and access needs TBD; modeled as 30 ft x 10 ft placeholder.",
-      "constraintId": "vehicle-alice-rv"
-    },
-    {
       "id": "vehicle-mqnc0b86",
       "label": "Sedan",
       "type": "vehicle",
@@ -860,6 +844,40 @@
       "layer": "infrastructure",
       "groupId": null,
       "notes": "Generic sedan footprint based on a Toyota Prius, rounded for layout planning."
+    },
+    {
+      "id": "vehicle-mqncx6st",
+      "label": "Sedan",
+      "type": "vehicle",
+      "shape": "rect",
+      "x": 87.30984064503939,
+      "y": 5.975066323037812,
+      "width": 15,
+      "height": 6,
+      "rotation": 315,
+      "color": "#7a8792",
+      "keepout": false,
+      "locked": false,
+      "layer": "infrastructure",
+      "groupId": null,
+      "notes": "Generic sedan footprint based on a Toyota Prius, rounded for layout planning."
+    },
+    {
+      "id": "vehicle-mqncx6su",
+      "label": "Pickup truck copy",
+      "type": "vehicle",
+      "shape": "rect",
+      "x": 72.51173251813081,
+      "y": 6.454753457026818,
+      "width": 19,
+      "height": 7,
+      "rotation": 315,
+      "color": "#6b7785",
+      "keepout": false,
+      "locked": false,
+      "layer": "infrastructure",
+      "groupId": null,
+      "notes": ""
     }
   ],
   "placement": {

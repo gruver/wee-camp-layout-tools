@@ -614,6 +614,7 @@
     <div class="json-tools">
       <button id="exportJson">Export JSON</button>
       <button id="copyLayoutLink">Copy Layout Link</button>
+      <button id="exportLayoutJpg">Export Layout JPG</button>
       <button id="importJson">Import JSON</button>
       <input id="importFile" class="file-input" type="file" accept="application/json,.json">
       <button id="printPdf" class="primary">Print / Save PDF</button>
@@ -1962,7 +1963,16 @@
       `;
     }
 
-    function renderPrintImage() {
+    function exportLayoutJpg() {
+      const link = document.createElement("a");
+      link.href = renderPrintImage("image/jpeg", 0.92);
+      link.download = `camp-layout-${new Date().toISOString().slice(0, 10)}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+
+    function renderPrintImage(mimeType = "image/png", quality) {
       const width = 1400;
       const height = Math.round(width * state.site.height / state.site.width);
       const offscreen = document.createElement("canvas");
@@ -1990,7 +2000,7 @@
         pctx.lineTo(width, y * scale);
         pctx.stroke();
       }
-      for (const entry of state.items) {
+      for (const entry of state.items.slice().sort(compareItemsForDrawing)) {
         const cx = (entry.x + entry.width / 2) * scale;
         const cy = (entry.y + entry.height / 2) * scale;
         const w = entry.width * scale;
@@ -2024,7 +2034,7 @@
         pctx.restore();
       }
       drawPrintOrientation(pctx, width, height);
-      return offscreen.toDataURL("image/png");
+      return offscreen.toDataURL(mimeType, quality);
     }
 
     function drawPrintOrientation(pctx, width, height) {
@@ -2178,6 +2188,7 @@
     document.getElementById("delete").addEventListener("click", deleteSelection);
     document.getElementById("exportJson").addEventListener("click", exportJson);
     document.getElementById("copyLayoutLink").addEventListener("click", copyLayoutLink);
+    document.getElementById("exportLayoutJpg").addEventListener("click", exportLayoutJpg);
     document.getElementById("importJson").addEventListener("click", () => document.getElementById("importFile").click());
     document.getElementById("importFile").addEventListener("change", (event) => importJsonFile(event.target.files[0]));
     document.getElementById("printPdf").addEventListener("click", () => {

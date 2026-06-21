@@ -21,6 +21,10 @@ Then open `http://127.0.0.1:8765/`.
 For editable layouts, use `Export JSON` and send the exported `.json` file.
 Another person can open `index.html`, use `Import JSON`, and continue editing.
 
+For a non-editable snapshot of only the map, use `Export Layout JPG`. This
+downloads a flat image of the layout without the inventory pages used by
+Print / Save PDF.
+
 For a hosted website, there are two link options:
 
 - Use `Copy Layout Link` for a self-contained URL hash. This works for smaller
@@ -66,6 +70,7 @@ https://YOUR_USER.github.io/wee_camp_layout_tools/?layout=layouts/draft-1.json
 - View a live inventory and area summary.
 - Autosave in browser local storage.
 - Export/import the editable layout as JSON.
+- Export just the layout map as a JPG image.
 - Use Print / Save PDF to generate a layout and inventory PDF.
 
 The editable layout data is plain JSON in the browser state, so saved `.json`
