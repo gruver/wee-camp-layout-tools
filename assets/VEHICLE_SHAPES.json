@@ -1,7 +1,8 @@
 {
-  "version": 1,
+  "version": 2,
   "units": "feet",
   "source": "VEHICLE_CONSTRAINTS.md",
+  "description": "2026-specific constrained vehicle, trailer, and infrastructure shapes for the editor toolbox.",
   "notes": "Shapes use conservative placeholder widths where raw notes only provided length. Update dimensions as owners confirm details.",
   "shapes": [
     {
@@ -13,6 +14,8 @@
       "width": 34,
       "height": 8,
       "color": "#5f6f83",
+      "x": 24,
+      "y": 62,
       "notes": "Toyota Tacoma 18 ft plus 16 ft trailer, modeled as combined 34 ft x 8 ft placeholder. Confirm width and whether truck/trailer can detach."
     },
     {
@@ -24,6 +27,8 @@
       "width": 20,
       "height": 8,
       "color": "#5377b0",
+      "x": 62,
+      "y": 62,
       "notes": "20 ft Sprinter van. Width TBD; modeled as 8 ft until confirmed."
     },
     {
@@ -35,6 +40,8 @@
       "width": 20,
       "height": 20,
       "color": "#597ca8",
+      "x": 86,
+      "y": 62,
       "notes": "Sprinter van and carport kept together as a 20 ft x 20 ft compound footprint. Confirm carport orientation and door-side clearance."
     },
     {
@@ -46,18 +53,9 @@
       "width": 22,
       "height": 8,
       "color": "#5377b0",
+      "x": 110,
+      "y": 62,
       "notes": "22 ft camper van. Width TBD; modeled as 8 ft until confirmed."
-    },
-    {
-      "constraintId": "vehicle-jeb-rissa-solar",
-      "label": "Jeb/Rissa solar zone",
-      "owner": "Jeb and Rissa",
-      "type": "other",
-      "shape": "rect",
-      "width": 12,
-      "height": 12,
-      "color": "#c6a33a",
-      "notes": "12 ft x 12 ft south-facing lower-shade footprint. Needs clear sun exposure for solar panels. Confirm whether this is vehicle, trailer, or standalone solar setup."
     },
     {
       "constraintId": "vehicle-alice-rv",
@@ -68,6 +66,8 @@
       "width": 30,
       "height": 10,
       "color": "#7d7188",
+      "x": 24,
+      "y": 86,
       "notes": "30 ft RV. Width, slide-outs, awning, door side, and access needs TBD; modeled as 30 ft x 10 ft placeholder."
     },
     {
@@ -79,6 +79,8 @@
       "width": 12,
       "height": 8,
       "color": "#7b697c",
+      "x": 58,
+      "y": 86,
       "notes": "12 ft trailer. Width, tow vehicle, detach status, and sleeping use TBD."
     },
     {
@@ -90,7 +92,22 @@
       "width": 35,
       "height": 9,
       "color": "#48586b",
+      "x": 74,
+      "y": 86,
       "notes": "35 ft box truck. Width and loading-door access side TBD; consider edge placement and storage/kitchen access."
+    },
+    {
+      "constraintId": "vehicle-jeb-rissa-solar",
+      "label": "Jeb/Rissa solar zone",
+      "owner": "Jeb and Rissa",
+      "type": "other",
+      "shape": "rect",
+      "width": 12,
+      "height": 12,
+      "color": "#c6a33a",
+      "x": 113,
+      "y": 86,
+      "notes": "12 ft x 12 ft south-facing lower-shade footprint. Needs clear sun exposure for solar panels. Confirm whether this is vehicle, trailer, or standalone solar setup."
     },
     {
       "constraintId": "vehicle-team-cargo-trailer",
@@ -101,6 +118,8 @@
       "width": 45,
       "height": 15,
       "color": "#6c5f73",
+      "x": 24,
+      "y": 104,
       "notes": "45 ft x 9 ft cargo trailer plus 6 ft stair/access allowance, modeled as 45 ft x 15 ft effective footprint. Confirm stair side and access geometry."
     }
   ]

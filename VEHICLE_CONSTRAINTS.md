@@ -22,8 +22,9 @@ so vehicle placement can be reviewed alongside the camp layout.
 
 - Current known vehicle/trailer inventory includes at least 9 distinct rigs or
   vehicle-related footprints.
-- `VEHICLE_SHAPES.json` converts these rows into map-loadable shapes. Length-only
-  entries use placeholder widths until owners confirm exact footprints.
+- `assets/VEHICLE_SHAPES.json` converts these rows into map-loadable shapes.
+  Length-only entries use placeholder widths until owners confirm exact
+  footprints.
 - Several entries only provide length; use conservative placeholder widths in
   the app until confirmed.
 - Ryan's van plus carport and Jeb/Rissa's solar footprint have non-vehicle

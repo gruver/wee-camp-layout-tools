@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "units": "feet",
   "site": {
     "width": 150,
@@ -7,7 +7,13 @@
     "grid": 5,
     "snap": 2,
     "serviceLaneWidth": 20,
-    "fixed": true
+    "fixed": true,
+    "edgeLabels": {
+      "top": "150' Neighbor",
+      "right": "150' Neighbor",
+      "bottom": "150' Street Frontage",
+      "left": "150' Neighbor"
+    }
   },
   "view": {
     "x": 63.5,
@@ -886,7 +892,9 @@
     "frontageDescription": "Street frontage / front yard",
     "manDirection": "Back of camp",
     "mountainDirection": "Street frontage",
-    "sunPath": "East to west across the plan",
+    "frontageBearingDegrees": 157.5,
+    "bearingReference": "3:45 is 157.5 deg when 4:30 is 180 deg south",
+    "sunPath": "East to west, rotated to the 3:45 camp bearing",
     "afternoonWind": "Typical afternoon wind SW -> NE"
   }
 }

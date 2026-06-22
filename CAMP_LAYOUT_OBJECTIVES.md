@@ -12,9 +12,13 @@ tradeoffs become clearer.
 - Population target: 25 people.
 - Frontage orientation: mid-block facing mountain.
 - Street-facing edge: mountain-facing frontage.
+- Adjoining edges: 150 ft street frontage on the frontage side; 150 ft neighbor
+  edge on each of the other three sides.
 - Direction toward The Man: back of camp from the frontage.
 - Direction toward mountains: out through the frontage/street side.
-- Sun path assumption: east to west across the plan.
+- Bearing assumption: if 4:30 is 180 deg south, then 3:45 is 157.5 deg,
+  approximately south-southeast.
+- Sun path assumption: east to west, rotated relative to the 3:45 camp bearing.
 - Afternoon wind assumption: typical afternoon winds blow from southwest toward
   northeast.
 
@@ -78,12 +82,16 @@ Preferred:
   assumptions.
 - Do not block the frontage with a continuous wall of vehicles unless that is an
   explicit design choice.
+- Keep neighbor-facing edges legible in exports so reviewers can distinguish
+  frontage from camp boundaries shared with neighboring camps.
 
 ## Direction And Shade Assumptions
 
 - Frontage/street side faces the mountains.
 - Back of camp points toward The Man.
-- Sun travel is treated as east to west for shade planning.
+- Sun travel is treated as east to west for shade planning. With the 3:45 camp
+  bearing at 157.5 deg, the sun overlay runs roughly from lower-right/east
+  toward upper-left/west on the layout.
 - Afternoon winds at Burning Man in the Black Rock Desert usually blow from the
   southwest toward the northeast. Desert thermal heating often makes these
   diurnal winds pick up in the afternoon and flow steadily in this direction.

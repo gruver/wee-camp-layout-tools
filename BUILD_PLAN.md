@@ -18,9 +18,13 @@ learn what layout workflows matter most.
 
 - `index.html` contains the complete app: HTML, CSS, JavaScript, canvas drawing,
   state model, import/export, and print/PDF rendering.
+- `assets/` contains reusable toolbox JSON files for generic camp pieces and
+  year-specific constrained shapes.
 - Browser local storage is used for autosave.
 - Exported `.json` layout files are the portable source of truth for named
   versions, alternatives, and backups.
+- `layouts/index.json` is the static manifest used to populate hosted starting
+  layouts.
 - The canvas render, inventory panel, and print/PDF output are all generated
   from the same in-memory JSON state.
 
@@ -28,14 +32,25 @@ learn what layout workflows matter most.
 
 The layout state is plain JSON:
 
-- `site`: fixed site dimensions, grid, snap distance, and service-lane width.
+- `site`: fixed site dimensions, grid, snap distance, service-lane width, and
+  editable edge-adjacency labels.
 - `placement`: address and orientation metadata such as frontage, mountain
-  direction, Man direction, and sun path.
+  direction, Man direction, camp bearing, and sun path.
 - `items`: every placed object, including geometry, position, rotation, label,
   type, layer, color, keepout status, lock status, group membership, and notes.
 - `groups`: logical clusters of item IDs that should move together.
 - `options`: user-facing display and editing toggles.
 - `view`: current canvas pan and zoom.
+
+Toolbox assets are separate JSON files:
+
+- `assets/GENERIC_CAMP_PIECES.json`: reusable standard object templates.
+- `assets/VEHICLE_SHAPES.json`: camp-year-specific constrained object
+  templates.
+
+These assets are versioned independently from saved layouts and from the editor
+implementation. Saved layouts store placed objects, not links back to toolbox
+templates.
 
 ## Web Tool Layout
 
@@ -43,19 +58,21 @@ The app is arranged in three primary regions.
 
 Left sidebar:
 
-- Site settings and placement note.
+- Site settings, edge-adjacency labels, and placement note.
 - Generic camp-pieces palette, with 12 ft x 20 ft Black Rock shade as the
-  primary shade structure preset.
+  primary shade structure preset, loaded from `assets/GENERIC_CAMP_PIECES.json`.
 - 2026 constraint-object palette for the specific vehicle, trailer, solar, and
-  access assumptions collected this year.
+  access assumptions collected this year, loaded from
+  `assets/VEHICLE_SHAPES.json`.
 - Custom shape form for new rectangles and ellipses.
 - JSON import/export and Print / Save PDF commands.
+- Starting-layout selector loaded from the layout manifest.
 
 Center workspace:
 
 - Scaled 2D canvas.
-- Site boundary, grid, service lane, placed objects, keepout zones, snap guides,
-  and orientation labels.
+- Site boundary, grid, edge labels, service lane, placed objects, keepout
+  zones, snap guides, and orientation labels.
 - Layered rendering, starting with `ground`, `infrastructure`, and `shade`.
   Ground is for zones such as service lanes, access keepouts, and parking
   circles. Infrastructure is for cars, tents, trailers, racks, generators, and

@@ -1,0 +1,172 @@
+{
+  "version": 1,
+  "units": "feet",
+  "description": "Reusable generic camp layout pieces for the editor toolbox.",
+  "pieces": [
+    {
+      "label": "Black Rock shade",
+      "type": "shade",
+      "shape": "rect",
+      "width": 12,
+      "height": 20,
+      "color": "#d8a742"
+    },
+    {
+      "label": "10x10 shade",
+      "type": "shade",
+      "shape": "rect",
+      "width": 10,
+      "height": 10,
+      "color": "#d8a742"
+    },
+    {
+      "label": "10x20 shade",
+      "type": "shade",
+      "shape": "rect",
+      "width": 20,
+      "height": 10,
+      "color": "#d8a742"
+    },
+    {
+      "label": "4-person tent",
+      "type": "tent",
+      "shape": "rect",
+      "width": 8,
+      "height": 8,
+      "color": "#5f8f5b"
+    },
+    {
+      "label": "Hexayurt",
+      "type": "tent",
+      "shape": "rect",
+      "width": 12,
+      "height": 14,
+      "color": "#76a98f"
+    },
+    {
+      "label": "Sprinter van",
+      "type": "vehicle",
+      "shape": "rect",
+      "width": 22,
+      "height": 8,
+      "color": "#5377b0"
+    },
+    {
+      "label": "SUV (4Runner size)",
+      "type": "vehicle",
+      "shape": "rect",
+      "width": 16,
+      "height": 7,
+      "color": "#66788f",
+      "notes": "Generic SUV footprint based on a Toyota 4Runner, rounded for layout planning."
+    },
+    {
+      "label": "Sedan (Prius size)",
+      "type": "vehicle",
+      "shape": "rect",
+      "width": 15,
+      "height": 6,
+      "color": "#7a8792",
+      "notes": "Generic sedan footprint based on a Toyota Prius, rounded for layout planning."
+    },
+    {
+      "label": "Pickup truck",
+      "type": "vehicle",
+      "shape": "rect",
+      "width": 19,
+      "height": 7,
+      "color": "#6b7785"
+    },
+    {
+      "label": "Box truck",
+      "type": "vehicle",
+      "shape": "rect",
+      "width": 26,
+      "height": 9,
+      "color": "#48586b"
+    },
+    {
+      "label": "Trailer",
+      "type": "vehicle",
+      "shape": "rect",
+      "width": 18,
+      "height": 8,
+      "color": "#7b697c"
+    },
+    {
+      "label": "Bike rack",
+      "type": "other",
+      "shape": "rect",
+      "width": 3,
+      "height": 6,
+      "color": "#4f8f7b",
+      "notes": "Bike rack footprint."
+    },
+    {
+      "label": "Generator area",
+      "type": "other",
+      "shape": "rect",
+      "width": 6,
+      "height": 6,
+      "color": "#9f7c3a",
+      "keepout": true,
+      "notes": "Generator footprint and immediate keep-clear area."
+    },
+    {
+      "label": "Fire ring",
+      "type": "other",
+      "shape": "ellipse",
+      "width": 15,
+      "height": 15,
+      "color": "#c65f3f",
+      "keepout": true,
+      "layer": "ground",
+      "notes": "15 ft diameter fire ring safety zone. Actual fire pit is 24 in x 30 in at center; chairs can be inside the ring, but keep other items away."
+    },
+    {
+      "label": "Kitchen zone",
+      "type": "kitchen",
+      "shape": "rect",
+      "width": 24,
+      "height": 16,
+      "color": "#bd7a45"
+    },
+    {
+      "label": "Fuel storage",
+      "type": "fuel",
+      "shape": "rect",
+      "width": 8,
+      "height": 8,
+      "color": "#bd5942",
+      "keepout": true
+    },
+    {
+      "label": "Water tank keepout",
+      "type": "water",
+      "shape": "rect",
+      "width": 18,
+      "height": 14,
+      "color": "#3b8d9b",
+      "keepout": true,
+      "layer": "ground"
+    },
+    {
+      "label": "Round dome",
+      "type": "shade",
+      "shape": "ellipse",
+      "width": 24,
+      "height": 24,
+      "color": "#7c7fb3"
+    },
+    {
+      "label": "Elephant MV parking",
+      "type": "other",
+      "shape": "ellipse",
+      "width": 40,
+      "height": 40,
+      "color": "#4f9f5f",
+      "layer": "ground",
+      "notes": "40 ft diameter parking zone for Elephant Mutant Vehicle."
+    }
+  ]
+}

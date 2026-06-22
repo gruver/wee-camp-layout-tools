@@ -543,6 +543,22 @@
         Snap ft
         <input id="snapSize" type="number" min="0" step="0.5">
       </label>
+      <label class="full">
+        Top edge
+        <input id="edgeTop" value="150' Neighbor">
+      </label>
+      <label>
+        Left edge
+        <input id="edgeLeft" value="150' Neighbor">
+      </label>
+      <label>
+        Right edge
+        <input id="edgeRight" value="150' Neighbor">
+      </label>
+      <label class="full">
+        Bottom edge
+        <input id="edgeBottom" value="150' Street Frontage">
+      </label>
     </div>
     <div class="button-row">
       <button id="fitView">Fit View</button>
@@ -612,6 +628,18 @@
 
     <h2>Files</h2>
     <div class="json-tools">
+      <label>
+        Starting layout
+        <select id="layoutSelect">
+          <option value="">Loading layout library...</option>
+        </select>
+      </label>
+      <button id="loadLayout">Load Starting Layout</button>
+      <p class="subtle" id="layoutLibraryStatus">Layouts are loaded from layouts/index.json when served locally or hosted.</p>
+      <label>
+        Export filename tag
+        <input id="exportNameTag" placeholder="Blank uses timestamp">
+      </label>
       <button id="exportJson">Export JSON</button>
       <button id="copyLayoutLink">Copy Layout Link</button>
       <button id="exportLayoutJpg">Export Layout JPG</button>
@@ -676,18 +704,32 @@
       snap: 2,
       serviceLaneWidth: 20
     };
+    const EDGE_LABEL_DEFAULTS = {
+      top: "150' Neighbor",
+      right: "150' Neighbor",
+      bottom: "150' Street Frontage",
+      left: "150' Neighbor"
+    };
     const PLACEMENT_DEFAULTS = {
       address: "Delphi & 3:45",
       frontageFacing: "Mid-block facing mountain",
       frontageDescription: "Street frontage / front yard",
       manDirection: "Back of camp",
       mountainDirection: "Street frontage",
-      sunPath: "East to west across the plan",
+      frontageBearingDegrees: 157.5,
+      bearingReference: "3:45 is 157.5 deg when 4:30 is 180 deg south",
+      sunPath: "East to west, rotated to the 3:45 camp bearing",
       afternoonWind: "Typical afternoon wind SW -> NE"
     };
     const LAYERS = ["ground", "infrastructure", "shade"];
 
-    const palette = [
+    const TOOLBOX_ASSETS = {
+      genericPieces: "assets/GENERIC_CAMP_PIECES.json",
+      vehicleShapes: "assets/VEHICLE_SHAPES.json"
+    };
+    const LAYOUT_LIBRARY_PATH = "layouts/index.json";
+
+    const DEFAULT_GENERIC_PIECES = [
       { label: "Black Rock shade", type: "shade", shape: "rect", width: 12, height: 20, color: "#d8a742" },
       { label: "10x10 shade", type: "shade", shape: "rect", width: 10, height: 10, color: "#d8a742" },
       { label: "10x20 shade", type: "shade", shape: "rect", width: 20, height: 10, color: "#d8a742" },
@@ -709,7 +751,7 @@
       { label: "Elephant MV parking", type: "other", shape: "ellipse", width: 40, height: 40, color: "#4f9f5f", layer: "ground", notes: "40 ft diameter parking zone for Elephant Mutant Vehicle." }
     ];
 
-    const constrainedVehicleTemplates = [
+    const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
       {
         constraintId: "vehicle-loren-rommel",
         label: "Loren Tacoma + trailer",
@@ -820,10 +862,14 @@
       }
     ];
 
+    let genericPieceTemplates = DEFAULT_GENERIC_PIECES.slice();
+    let constrainedVehicleTemplates = DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES.slice();
+    let layoutLibraryEntries = [];
+
     const demoLayout = {
       version: 1,
       units: "feet",
-      site: { width: 150, height: 150, grid: 5, snap: 2, serviceLaneWidth: 20, fixed: true },
+      site: { width: 150, height: 150, grid: 5, snap: 2, serviceLaneWidth: 20, fixed: true, edgeLabels: { ...EDGE_LABEL_DEFAULTS } },
       placement: { ...PLACEMENT_DEFAULTS },
       view: { x: 0, y: 0, scale: 5 },
       options: { snap: true, grid: true, showSun: true, showWind: true },
@@ -861,6 +907,12 @@
       siteHeight: document.getElementById("siteHeight"),
       gridSize: document.getElementById("gridSize"),
       snapSize: document.getElementById("snapSize"),
+      edgeTop: document.getElementById("edgeTop"),
+      edgeRight: document.getElementById("edgeRight"),
+      edgeBottom: document.getElementById("edgeBottom"),
+      edgeLeft: document.getElementById("edgeLeft"),
+      layoutSelect: document.getElementById("layoutSelect"),
+      layoutLibraryStatus: document.getElementById("layoutLibraryStatus"),
       palette: document.getElementById("palette"),
       constraintPalette: document.getElementById("constraintPalette"),
       selectionPanel: document.getElementById("selectionPanel"),
@@ -928,7 +980,7 @@
 
     function normalizeLayout(layout) {
       const previousVersion = Number(layout.version || 1);
-      layout.version = Math.max(3, previousVersion);
+      layout.version = Math.max(4, previousVersion);
       layout.units = "feet";
       layout.site = {
         ...layout.site,
@@ -937,6 +989,7 @@
         grid: Number(layout.site && layout.site.grid) || SITE_DEFAULTS.grid,
         snap: Number(layout.site && layout.site.snap) || SITE_DEFAULTS.snap,
         serviceLaneWidth: SITE_DEFAULTS.serviceLaneWidth,
+        edgeLabels: normalizeEdgeLabels(layout.site && layout.site.edgeLabels),
         fixed: true
       };
       layout.placement = { ...PLACEMENT_DEFAULTS, ...(layout.placement || {}) };
@@ -949,6 +1002,10 @@
       }
       ensureServiceLane(layout);
       return layout;
+    }
+
+    function normalizeEdgeLabels(edgeLabels) {
+      return { ...EDGE_LABEL_DEFAULTS, ...(edgeLabels || {}) };
     }
 
     function ensureServiceLane(layout) {
@@ -1057,6 +1114,7 @@
       ctx.fillStyle = "#4b4f4a";
       ctx.font = "12px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
       ctx.fillText(`${state.site.width} ft x ${state.site.height} ft`, p.x + 10, p.y + 20);
+      drawEdgeLabels(ctx, p.x, p.y, w, h, state.site.edgeLabels, { outside: true, size: 14, offset: 22 });
       ctx.restore();
     }
 
@@ -1072,8 +1130,7 @@
       drawBadge("The Man", midX, p.y + 60, "#ffffff");
       if (state.options.showSun !== false) {
         ctx.lineWidth = 3;
-        drawArrow(ctx, p.x + 34, p.y + 30, q.x - 34, p.y + 30, "#b1842e");
-        drawBadge("Sun path E -> W", midX, p.y + 30, "#fffdfa", 16);
+        drawSunPath(ctx, p.x, p.y, q.x - p.x, q.y - p.y, 34, 16);
       }
       if (state.options.showWind !== false) {
         ctx.lineWidth = 3;
@@ -1082,6 +1139,41 @@
       }
       drawBadge(`${state.placement.address} frontage: ${state.placement.frontageFacing}`, midX, q.y - 18, "#fffdfa");
       ctx.restore();
+    }
+
+    function drawSunPath(targetCtx, left, top, width, height, margin, labelSize) {
+      const centerX = left + width / 2;
+      const centerY = top + height / 2;
+      const east = compassBearingToScreenVector(90);
+      const limit = lineLimitWithinRect(width, height, east, margin);
+      const startX = centerX + east.x * limit;
+      const startY = centerY + east.y * limit;
+      const endX = centerX - east.x * limit;
+      const endY = centerY - east.y * limit;
+      drawArrow(targetCtx, startX, startY, endX, endY, "#b1842e");
+      if (targetCtx === ctx) drawBadge("Sun E -> W", centerX, centerY, "#fffdfa", labelSize);
+      else printBadge(targetCtx, "Sun E -> W", centerX, centerY, labelSize);
+    }
+
+    function compassBearingToScreenVector(bearingDegrees) {
+      const frontageBearing = Number(state.placement.frontageBearingDegrees || PLACEMENT_DEFAULTS.frontageBearingDegrees);
+      const rightBearing = frontageBearing - 90;
+      return {
+        x: Math.cos(degToRad(bearingDegrees - rightBearing)),
+        y: Math.cos(degToRad(bearingDegrees - frontageBearing))
+      };
+    }
+
+    function lineLimitWithinRect(width, height, unit, margin) {
+      const halfWidth = Math.max(0, width / 2 - margin);
+      const halfHeight = Math.max(0, height / 2 - margin);
+      const limitX = Math.abs(unit.x) > 0.001 ? halfWidth / Math.abs(unit.x) : Infinity;
+      const limitY = Math.abs(unit.y) > 0.001 ? halfHeight / Math.abs(unit.y) : Infinity;
+      return Math.min(limitX, limitY);
+    }
+
+    function degToRad(degrees) {
+      return degrees * Math.PI / 180;
     }
 
     function drawArrow(targetCtx, x1, y1, x2, y2, color) {
@@ -1118,6 +1210,41 @@
       ctx.fillStyle = "#202124";
       ctx.fillText(text, x, y);
       ctx.restore();
+    }
+
+    function drawEdgeLabels(targetCtx, left, top, width, height, labels, options = {}) {
+      const edgeLabels = normalizeEdgeLabels(labels);
+      const size = options.size || 14;
+      const offset = options.offset || 20;
+      const outside = options.outside !== false;
+      const horizontalYTop = outside ? top - offset : top + offset;
+      const horizontalYBottom = outside ? top + height + offset : top + height - offset;
+      const verticalXLeft = outside ? left - offset : left + offset;
+      const verticalXRight = outside ? left + width + offset : left + width - offset;
+      drawEdgeLabel(targetCtx, edgeLabels.top, left + width / 2, horizontalYTop, 0, size, Math.max(40, width - 20));
+      drawEdgeLabel(targetCtx, edgeLabels.right, verticalXRight, top + height / 2, Math.PI / 2, size, Math.max(40, height - 20));
+      drawEdgeLabel(targetCtx, edgeLabels.bottom, left + width / 2, horizontalYBottom, 0, size, Math.max(40, width - 20));
+      drawEdgeLabel(targetCtx, edgeLabels.left, verticalXLeft, top + height / 2, -Math.PI / 2, size, Math.max(40, height - 20));
+    }
+
+    function drawEdgeLabel(targetCtx, text, x, y, rotation, size, maxTextWidth) {
+      if (!text) return;
+      targetCtx.save();
+      targetCtx.translate(x, y);
+      targetCtx.rotate(rotation);
+      targetCtx.font = `700 ${size}px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif`;
+      targetCtx.textAlign = "center";
+      targetCtx.textBaseline = "middle";
+      const padX = size * 0.75;
+      const labelWidth = Math.min(targetCtx.measureText(text).width, maxTextWidth) + padX * 2;
+      const labelHeight = size + 10;
+      targetCtx.fillStyle = "rgba(255, 255, 255, 0.92)";
+      targetCtx.strokeStyle = "rgba(32, 33, 36, 0.26)";
+      targetCtx.fillRect(-labelWidth / 2, -labelHeight / 2, labelWidth, labelHeight);
+      targetCtx.strokeRect(-labelWidth / 2, -labelHeight / 2, labelWidth, labelHeight);
+      targetCtx.fillStyle = "#202124";
+      targetCtx.fillText(text, 0, 0, maxTextWidth);
+      targetCtx.restore();
     }
 
     function drawGrid() {
@@ -1476,19 +1603,20 @@
 
     function loadConstraintVehicles() {
       const selected = [];
-      for (const template of constrainedVehicleTemplates) {
+      for (const [index, template] of constrainedVehicleTemplates.entries()) {
         const existing = state.items.find((entry) => entry.constraintId === template.constraintId);
         if (existing) {
           selected.push(existing.id);
           continue;
         }
+        const position = templateStartPosition(template, index);
         const entry = item(
           template.constraintId,
           template.label,
           template.type,
           template.shape,
-          template.x,
-          template.y,
+          position.x,
+          position.y,
           template.width,
           template.height,
           0,
@@ -1504,6 +1632,19 @@
       applySelection(selected, false);
       renderPalette();
       saveSoon();
+    }
+
+    function templateStartPosition(template, index) {
+      const hasX = Number.isFinite(Number(template.x));
+      const hasY = Number.isFinite(Number(template.y));
+      if (hasX && hasY) return { x: Number(template.x), y: Number(template.y) };
+      const laneOffset = Number(state.site.serviceLaneWidth || 0);
+      const columns = 4;
+      const col = index % columns;
+      const row = Math.floor(index / columns);
+      const x = Math.min(state.site.width - template.width, laneOffset + 4 + col * 26);
+      const y = Math.min(state.site.height - template.height, 62 + row * 22);
+      return { x: Math.max(0, x), y: Math.max(0, y) };
     }
 
     function visibleWorldBounds() {
@@ -1613,7 +1754,7 @@
     }
 
     function renderPalette() {
-      renderPaletteInto(els.palette, palette);
+      renderPaletteInto(els.palette, genericPieceTemplates);
       renderPaletteInto(els.constraintPalette, constrainedVehicleTemplates);
     }
 
@@ -1646,6 +1787,10 @@
       els.siteHeight.value = state.site.height;
       els.gridSize.value = state.site.grid;
       els.snapSize.value = state.site.snap;
+      els.edgeTop.value = state.site.edgeLabels.top;
+      els.edgeRight.value = state.site.edgeLabels.right;
+      els.edgeBottom.value = state.site.edgeLabels.bottom;
+      els.edgeLeft.value = state.site.edgeLabels.left;
       document.getElementById("toggleSnap").textContent = state.options.snap ? "Snap On" : "Snap Off";
       document.getElementById("toggleGrid").textContent = state.options.grid ? "Grid On" : "Grid Off";
       document.getElementById("toggleSun").textContent = state.options.showSun !== false ? "Sun On" : "Sun Off";
@@ -1851,9 +1996,36 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `camp-layout-${new Date().toISOString().slice(0, 10)}.json`;
+      link.download = exportJsonFilename();
       link.click();
       URL.revokeObjectURL(url);
+    }
+
+    function exportJsonFilename() {
+      const tag = slugifyFilenamePart(document.getElementById("exportNameTag").value);
+      return `camp-layout-${tag || timestampFilenamePart()}.json`;
+    }
+
+    function timestampFilenamePart(date = new Date()) {
+      const pad = (value) => String(value).padStart(2, "0");
+      return [
+        date.getFullYear(),
+        pad(date.getMonth() + 1),
+        pad(date.getDate())
+      ].join("-") + "-" + [
+        pad(date.getHours()),
+        pad(date.getMinutes()),
+        pad(date.getSeconds())
+      ].join("");
+    }
+
+    function slugifyFilenamePart(value) {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 80);
     }
 
     function importJsonFile(file) {
@@ -1887,15 +2059,119 @@
       const hashMatch = window.location.hash.match(/^#layout=(.+)$/);
       try {
         if (layoutPath) {
-          const response = await fetch(layoutPath);
-          if (!response.ok) throw new Error(`Could not load ${layoutPath}`);
-          applyImportedLayout(await response.json());
+          await loadLayoutByPath(layoutPath);
         } else if (hashMatch) {
           applyImportedLayout(decodeLayoutHash(hashMatch[1]));
         }
       } catch (error) {
         alert(`Could not load linked layout: ${error.message}`);
       }
+    }
+
+    async function loadSelectedLibraryLayout() {
+      const path = els.layoutSelect.value;
+      if (!path) return;
+      try {
+        await loadLayoutByPath(path);
+        const entry = layoutLibraryEntries.find((candidate) => candidate.path === path);
+        els.layoutLibraryStatus.textContent = `Loaded ${entry ? entry.label : path}`;
+      } catch (error) {
+        alert(`Could not load selected layout: ${error.message}`);
+      }
+    }
+
+    async function loadLayoutByPath(path) {
+      const response = await fetch(path);
+      if (!response.ok) throw new Error(`Could not load ${path}`);
+      applyImportedLayout(await response.json());
+    }
+
+    async function loadLayoutLibrary() {
+      if (window.location.protocol === "file:") {
+        layoutLibraryEntries = [];
+        renderLayoutLibrary();
+        els.layoutLibraryStatus.textContent = "Serve this folder locally or host it to load layouts from layouts/index.json.";
+        return;
+      }
+      try {
+        const response = await fetch(LAYOUT_LIBRARY_PATH);
+        if (!response.ok) throw new Error(`Could not load ${LAYOUT_LIBRARY_PATH}`);
+        const data = await response.json();
+        layoutLibraryEntries = Array.isArray(data.layouts) ? data.layouts.map(normalizeLayoutLibraryEntry).filter(Boolean) : [];
+        renderLayoutLibrary();
+        els.layoutLibraryStatus.textContent = layoutLibraryEntries.length
+          ? `${layoutLibraryEntries.length} starting layout${layoutLibraryEntries.length === 1 ? "" : "s"} available`
+          : "No layouts are listed in layouts/index.json.";
+      } catch (error) {
+        console.warn(error);
+        layoutLibraryEntries = [];
+        renderLayoutLibrary();
+        els.layoutLibraryStatus.textContent = "Could not load layouts/index.json.";
+      }
+    }
+
+    function normalizeLayoutLibraryEntry(entry) {
+      const label = String(entry.label || "").trim();
+      const path = String(entry.path || "").trim();
+      if (!label || !path || !path.endsWith(".json")) return null;
+      return { label, path, description: String(entry.description || "").trim() };
+    }
+
+    function renderLayoutLibrary() {
+      els.layoutSelect.innerHTML = "";
+      if (!layoutLibraryEntries.length) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "No hosted layouts available";
+        els.layoutSelect.append(option);
+        document.getElementById("loadLayout").disabled = true;
+        return;
+      }
+      for (const entry of layoutLibraryEntries) {
+        const option = document.createElement("option");
+        option.value = entry.path;
+        option.textContent = entry.label;
+        if (entry.description) option.title = entry.description;
+        els.layoutSelect.append(option);
+      }
+      document.getElementById("loadLayout").disabled = false;
+    }
+
+    async function loadToolboxAssets() {
+      const [genericPieces, vehicleShapes] = await Promise.all([
+        loadToolboxAsset(TOOLBOX_ASSETS.genericPieces, "pieces", DEFAULT_GENERIC_PIECES),
+        loadToolboxAsset(TOOLBOX_ASSETS.vehicleShapes, "shapes", DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES)
+      ]);
+      genericPieceTemplates = genericPieces;
+      constrainedVehicleTemplates = vehicleShapes;
+      renderPalette();
+    }
+
+    async function loadToolboxAsset(path, collectionKey, fallbackTemplates) {
+      if (window.location.protocol === "file:") return fallbackTemplates.slice();
+      try {
+        const response = await fetch(path);
+        if (!response.ok) throw new Error(`Could not load ${path}`);
+        const data = await response.json();
+        const templates = Array.isArray(data[collectionKey]) ? data[collectionKey] : data.shapes;
+        if (!Array.isArray(templates)) throw new Error(`${path} is missing ${collectionKey}`);
+        return templates.map(normalizeTemplate).filter(Boolean);
+      } catch (error) {
+        console.warn(error);
+        return fallbackTemplates.slice();
+      }
+    }
+
+    function normalizeTemplate(template) {
+      const normalized = { ...template };
+      normalized.label = String(normalized.label || "").trim();
+      normalized.type = normalized.type || "other";
+      normalized.shape = normalized.shape === "ellipse" ? "ellipse" : "rect";
+      normalized.width = Number(normalized.width);
+      normalized.height = Number(normalized.height);
+      normalized.color = normalized.color || "#66706f";
+      if (!normalized.label || !Number.isFinite(normalized.width) || !Number.isFinite(normalized.height)) return null;
+      return normalized;
     }
 
     async function copyLayoutLink() {
@@ -1974,35 +2250,39 @@
 
     function renderPrintImage(mimeType = "image/png", quality) {
       const width = 1400;
-      const height = Math.round(width * state.site.height / state.site.width);
+      const pad = 82;
+      const siteWidth = width - pad * 2;
+      const siteHeight = Math.round(siteWidth * state.site.height / state.site.width);
+      const height = siteHeight + pad * 2;
       const offscreen = document.createElement("canvas");
       offscreen.width = width;
       offscreen.height = height;
       const pctx = offscreen.getContext("2d");
-      const scale = width / state.site.width;
+      const scale = siteWidth / state.site.width;
       pctx.fillStyle = "#ffffff";
       pctx.fillRect(0, 0, width, height);
       pctx.strokeStyle = "#222222";
       pctx.lineWidth = 2;
-      pctx.strokeRect(0, 0, width, height);
+      pctx.strokeRect(pad, pad, siteWidth, siteHeight);
       pctx.strokeStyle = "#e5e5e5";
       pctx.lineWidth = 1;
       const grid = Math.max(1, state.site.grid || 5);
       for (let x = grid; x < state.site.width; x += grid) {
         pctx.beginPath();
-        pctx.moveTo(x * scale, 0);
-        pctx.lineTo(x * scale, height);
+        pctx.moveTo(pad + x * scale, pad);
+        pctx.lineTo(pad + x * scale, pad + siteHeight);
         pctx.stroke();
       }
       for (let y = grid; y < state.site.height; y += grid) {
         pctx.beginPath();
-        pctx.moveTo(0, y * scale);
-        pctx.lineTo(width, y * scale);
+        pctx.moveTo(pad, pad + y * scale);
+        pctx.lineTo(pad + siteWidth, pad + y * scale);
         pctx.stroke();
       }
+      drawEdgeLabels(pctx, pad, pad, siteWidth, siteHeight, state.site.edgeLabels, { outside: true, size: 24, offset: 28 });
       for (const entry of state.items.slice().sort(compareItemsForDrawing)) {
-        const cx = (entry.x + entry.width / 2) * scale;
-        const cy = (entry.y + entry.height / 2) * scale;
+        const cx = pad + (entry.x + entry.width / 2) * scale;
+        const cy = pad + (entry.y + entry.height / 2) * scale;
         const w = entry.width * scale;
         const h = entry.height * scale;
         pctx.save();
@@ -2033,31 +2313,32 @@
         pctx.fillText(`${entry.width}x${entry.height}`, 0, 15);
         pctx.restore();
       }
-      drawPrintOrientation(pctx, width, height);
+      drawPrintOrientation(pctx, pad, pad, siteWidth, siteHeight);
       return offscreen.toDataURL(mimeType, quality);
     }
 
-    function drawPrintOrientation(pctx, width, height) {
-      const midX = width / 2;
+    function drawPrintOrientation(pctx, left, top, width, height) {
+      const right = left + width;
+      const bottom = top + height;
+      const midX = left + width / 2;
       pctx.save();
       pctx.font = "18px Arial, sans-serif";
       pctx.textAlign = "center";
       pctx.textBaseline = "middle";
-      drawArrow(pctx, midX, height - 66, midX, height - 28, "#6f7f8f");
-      printBadge(pctx, "Street / mountains", midX, height - 84);
-      drawArrow(pctx, midX, 72, midX, 30, "#506fa8");
-      printBadge(pctx, "The Man", midX, 94);
+      drawArrow(pctx, midX, bottom - 54, midX, bottom - 20, "#6f7f8f");
+      printBadge(pctx, "Street / mountains", midX, bottom - 70);
+      drawArrow(pctx, midX, top + 54, midX, top + 20, "#506fa8");
+      printBadge(pctx, "The Man", midX, top + 72);
       if (state.options.showSun !== false) {
         pctx.lineWidth = 3;
-        drawArrow(pctx, 54, 46, width - 54, 46, "#b1842e");
-        printBadge(pctx, "Sun path E -> W", midX, 46, 24);
+        drawSunPath(pctx, left, top, width, height, 54, 24);
       }
       if (state.options.showWind !== false) {
         pctx.lineWidth = 3;
-        drawArrow(pctx, 72, height - 76, width - 72, 130, "#8f6a9d");
-        printBadge(pctx, "Afternoon wind SW -> NE", midX, height / 2 + 28, 24);
+        drawArrow(pctx, left + 72, bottom - 76, right - 72, top + 130, "#8f6a9d");
+        printBadge(pctx, "Afternoon wind SW -> NE", midX, top + height / 2 + 28, 24);
       }
-      printBadge(pctx, `${state.placement.address} frontage: ${state.placement.frontageFacing}`, midX, height - 28);
+      printBadge(pctx, `${state.placement.address} frontage: ${state.placement.frontageFacing}`, midX, bottom + 58);
       pctx.restore();
     }
 
@@ -2186,6 +2467,7 @@
     document.getElementById("group").addEventListener("click", groupSelection);
     document.getElementById("ungroup").addEventListener("click", ungroupSelection);
     document.getElementById("delete").addEventListener("click", deleteSelection);
+    document.getElementById("loadLayout").addEventListener("click", loadSelectedLibraryLayout);
     document.getElementById("exportJson").addEventListener("click", exportJson);
     document.getElementById("copyLayoutLink").addEventListener("click", copyLayoutLink);
     document.getElementById("exportLayoutJpg").addEventListener("click", exportLayoutJpg);
@@ -2228,6 +2510,19 @@
       });
     }
 
+    for (const input of [els.edgeTop, els.edgeRight, els.edgeBottom, els.edgeLeft]) {
+      input.addEventListener("input", () => {
+        state.site.edgeLabels = {
+          top: els.edgeTop.value,
+          right: els.edgeRight.value,
+          bottom: els.edgeBottom.value,
+          left: els.edgeLeft.value
+        };
+        saveSoon();
+        draw();
+      });
+    }
+
     window.addEventListener("resize", resizeCanvas);
 
     function loadStateFromDemo() {
@@ -2245,6 +2540,8 @@
     renderPanels();
     resizeCanvas();
     requestAnimationFrame(fitView);
+    loadToolboxAssets();
+    loadLayoutLibrary();
     loadLayoutFromUrl();
   </script>
 </body>

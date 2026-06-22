@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "layouts": [
+    {
+      "label": "2026 working layout",
+      "path": "layouts/camp-layout-2026-06-21.json",
+      "description": "Current 150 ft x 150 ft Delphi & 3:45 working layout."
+    }
+  ]
+}
