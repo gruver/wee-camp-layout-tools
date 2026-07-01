@@ -35,7 +35,7 @@
       overflow: hidden;
       background: var(--bg);
       color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
       font-size: 14px;
     }
 
@@ -217,6 +217,10 @@
 
     .form-grid .full {
       grid-column: 1 / -1;
+    }
+
+    .submission-form {
+      margin-top: 8px;
     }
 
     .check-row {
@@ -466,7 +470,7 @@
       .print-sheet {
         display: block;
         color: #111111;
-        font-family: Arial, sans-serif;
+        font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
         padding: 0;
       }
 
@@ -647,6 +651,43 @@
       <input id="importFile" class="file-input" type="file" accept="application/json,.json">
       <button id="printPdf" class="primary">Print / Save PDF</button>
     </div>
+
+    <h2>JPEG Submission Details</h2>
+    <p class="subtle">Added to the top of exported JPEGs only. These fields are not saved in layouts or browser storage.</p>
+    <div class="form-grid submission-form">
+      <label class="full">
+        Camp name
+        <input id="submissionCampName" autocomplete="off" required>
+      </label>
+      <label>
+        First name
+        <input id="submissionFirstName" autocomplete="off" required>
+      </label>
+      <label>
+        Last name
+        <input id="submissionLastName" autocomplete="off" required>
+      </label>
+      <label class="full">
+        Playa name (optional)
+        <input id="submissionPlayaName">
+      </label>
+      <label class="full">
+        Email
+        <input id="submissionEmail" type="email" autocomplete="off" required>
+      </label>
+      <label class="full">
+        Phone number
+        <input id="submissionPhone" type="tel" autocomplete="off" required>
+      </label>
+      <label>
+        Date
+        <input id="submissionDate" type="date" required>
+      </label>
+      <label>
+        Version
+        <input id="submissionVersion" value="1" required>
+      </label>
+    </div>
   </aside>
 
   <main>
@@ -696,6 +737,7 @@
 
   <script>
     const STORAGE_KEY = "camp-layout-planner-v1";
+    const FONT_FAMILY = '"IBM Plex Sans", "Helvetica Neue", Arial, sans-serif';
     const DPR = Math.max(1, window.devicePixelRatio || 1);
     const SITE_DEFAULTS = {
       width: 150,
@@ -1112,7 +1154,7 @@
       ctx.fillRect(p.x, p.y, w, h);
       ctx.strokeRect(p.x, p.y, w, h);
       ctx.fillStyle = "#4b4f4a";
-      ctx.font = "12px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+      ctx.font = `12px ${FONT_FAMILY}`;
       ctx.fillText(`${state.site.width} ft x ${state.site.height} ft`, p.x + 10, p.y + 20);
       drawEdgeLabels(ctx, p.x, p.y, w, h, state.site.edgeLabels, { outside: true, size: 14, offset: 22 });
       ctx.restore();
@@ -1197,7 +1239,7 @@
 
     function drawBadge(text, x, y, fill, size = 12) {
       ctx.save();
-      ctx.font = `${size}px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif`;
+      ctx.font = `${size}px ${FONT_FAMILY}`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       const padX = size * 0.65;
@@ -1232,7 +1274,7 @@
       targetCtx.save();
       targetCtx.translate(x, y);
       targetCtx.rotate(rotation);
-      targetCtx.font = `700 ${size}px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif`;
+      targetCtx.font = `700 ${size}px ${FONT_FAMILY}`;
       targetCtx.textAlign = "center";
       targetCtx.textBaseline = "middle";
       const padX = size * 0.75;
@@ -1325,17 +1367,17 @@
         ctx.fillStyle = "rgba(255, 255, 255, 0.72)";
         ctx.fillRect(w / 2 - 18, -h / 2 + 4, 14, 14);
         ctx.fillStyle = "#333333";
-        ctx.font = "10px sans-serif";
+        ctx.font = `10px ${FONT_FAMILY}`;
         ctx.fillText("L", w / 2 - 14, -h / 2 + 15);
       }
       const textMax = Math.max(30, w - 8);
       ctx.fillStyle = readableTextColor(entry.color);
-      ctx.font = `${Math.max(10, Math.min(15, h * 0.22))}px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif`;
+      ctx.font = `${Math.max(10, Math.min(15, h * 0.22))}px ${FONT_FAMILY}`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       const label = fitText(entry.label, textMax);
       ctx.fillText(label, 0, -4);
-      ctx.font = "10px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+      ctx.font = `10px ${FONT_FAMILY}`;
       ctx.fillText(`${entry.width}x${entry.height}`, 0, 10);
       ctx.restore();
     }
@@ -2240,20 +2282,27 @@
     }
 
     function exportLayoutJpg() {
+      const missing = missingSubmissionDetails();
+      if (missing.length) {
+        alert(`Enter the required JPEG submission details: ${missing.join(", ")}.`);
+        return;
+      }
       const link = document.createElement("a");
-      link.href = renderPrintImage("image/jpeg", 0.92);
-      link.download = `camp-layout-${new Date().toISOString().slice(0, 10)}.jpg`;
+      link.href = renderPrintImage("image/jpeg", 0.92, { submissionHeader: true });
+      link.download = `camp-layout-${timestampFilenamePart().slice(0, 10)}.jpg`;
       document.body.appendChild(link);
       link.click();
       link.remove();
     }
 
-    function renderPrintImage(mimeType = "image/png", quality) {
+    function renderPrintImage(mimeType = "image/png", quality, options = {}) {
       const width = 1400;
       const pad = 82;
+      const headerHeight = options.submissionHeader ? 170 : 0;
+      const mapTop = pad + headerHeight;
       const siteWidth = width - pad * 2;
       const siteHeight = Math.round(siteWidth * state.site.height / state.site.width);
-      const height = siteHeight + pad * 2;
+      const height = siteHeight + pad * 2 + headerHeight;
       const offscreen = document.createElement("canvas");
       offscreen.width = width;
       offscreen.height = height;
@@ -2263,26 +2312,27 @@
       pctx.fillRect(0, 0, width, height);
       pctx.strokeStyle = "#222222";
       pctx.lineWidth = 2;
-      pctx.strokeRect(pad, pad, siteWidth, siteHeight);
+      if (options.submissionHeader) drawSubmissionHeader(pctx, pad, siteWidth);
+      pctx.strokeRect(pad, mapTop, siteWidth, siteHeight);
       pctx.strokeStyle = "#e5e5e5";
       pctx.lineWidth = 1;
       const grid = Math.max(1, state.site.grid || 5);
       for (let x = grid; x < state.site.width; x += grid) {
         pctx.beginPath();
-        pctx.moveTo(pad + x * scale, pad);
-        pctx.lineTo(pad + x * scale, pad + siteHeight);
+        pctx.moveTo(pad + x * scale, mapTop);
+        pctx.lineTo(pad + x * scale, mapTop + siteHeight);
         pctx.stroke();
       }
       for (let y = grid; y < state.site.height; y += grid) {
         pctx.beginPath();
-        pctx.moveTo(pad, pad + y * scale);
-        pctx.lineTo(pad + siteWidth, pad + y * scale);
+        pctx.moveTo(pad, mapTop + y * scale);
+        pctx.lineTo(pad + siteWidth, mapTop + y * scale);
         pctx.stroke();
       }
-      drawEdgeLabels(pctx, pad, pad, siteWidth, siteHeight, state.site.edgeLabels, { outside: true, size: 24, offset: 28 });
+      drawEdgeLabels(pctx, pad, mapTop, siteWidth, siteHeight, state.site.edgeLabels, { outside: true, size: 24, offset: 28 });
       for (const entry of state.items.slice().sort(compareItemsForDrawing)) {
         const cx = pad + (entry.x + entry.width / 2) * scale;
-        const cy = pad + (entry.y + entry.height / 2) * scale;
+        const cy = mapTop + (entry.y + entry.height / 2) * scale;
         const w = entry.width * scale;
         const h = entry.height * scale;
         pctx.save();
@@ -2305,16 +2355,70 @@
           pctx.strokeRect(-w / 2, -h / 2, w, h);
         }
         pctx.fillStyle = readableTextColor(entry.color);
-        pctx.font = "18px Arial, sans-serif";
+        pctx.font = `18px ${FONT_FAMILY}`;
         pctx.textAlign = "center";
         pctx.textBaseline = "middle";
         pctx.fillText(entry.label, 0, -5, Math.max(30, w - 12));
-        pctx.font = "13px Arial, sans-serif";
+        pctx.font = `13px ${FONT_FAMILY}`;
         pctx.fillText(`${entry.width}x${entry.height}`, 0, 15);
         pctx.restore();
       }
-      drawPrintOrientation(pctx, pad, pad, siteWidth, siteHeight);
+      drawPrintOrientation(pctx, pad, mapTop, siteWidth, siteHeight);
       return offscreen.toDataURL(mimeType, quality);
+    }
+
+    function submissionDetails() {
+      const value = (id) => document.getElementById(id).value.trim();
+      return {
+        campName: value("submissionCampName"),
+        firstName: value("submissionFirstName"),
+        lastName: value("submissionLastName"),
+        playaName: value("submissionPlayaName"),
+        email: value("submissionEmail"),
+        phone: value("submissionPhone"),
+        date: value("submissionDate"),
+        version: value("submissionVersion")
+      };
+    }
+
+    function missingSubmissionDetails() {
+      const details = submissionDetails();
+      const required = {
+        "camp name": details.campName,
+        "first name": details.firstName,
+        "last name": details.lastName,
+        email: details.email,
+        "phone number": details.phone,
+        date: details.date,
+        version: details.version
+      };
+      return Object.entries(required).filter(([, value]) => !value).map(([label]) => label);
+    }
+
+    function drawSubmissionHeader(pctx, left, width) {
+      const details = submissionDetails();
+      const fullName = [details.firstName, details.lastName].filter(Boolean).join(" ");
+      const nameParts = [fullName, details.playaName ? `Playa name: ${details.playaName}` : ""].filter(Boolean);
+      const contactParts = [details.email, details.phone].filter(Boolean);
+      const versionParts = [details.date, details.version ? `Version ${details.version}` : ""].filter(Boolean);
+      pctx.save();
+      pctx.fillStyle = "#111111";
+      pctx.textAlign = "left";
+      pctx.textBaseline = "alphabetic";
+      pctx.font = `700 34px ${FONT_FAMILY}`;
+      pctx.fillText(details.campName || "Camp Layout", left, 50, width);
+      pctx.font = `20px ${FONT_FAMILY}`;
+      pctx.fillText(nameParts.join(" | ") || "Name not entered", left, 88, width);
+      pctx.fillText(contactParts.join(" | ") || "Contact details not entered", left, 120, width * 0.6);
+      pctx.textAlign = "right";
+      pctx.fillText(versionParts.join(" | ") || "Date and version not entered", left + width, 120, width / 2);
+      pctx.strokeStyle = "#b8b8b8";
+      pctx.lineWidth = 1;
+      pctx.beginPath();
+      pctx.moveTo(left, 146);
+      pctx.lineTo(left + width, 146);
+      pctx.stroke();
+      pctx.restore();
     }
 
     function drawPrintOrientation(pctx, left, top, width, height) {
@@ -2322,7 +2426,7 @@
       const bottom = top + height;
       const midX = left + width / 2;
       pctx.save();
-      pctx.font = "18px Arial, sans-serif";
+      pctx.font = `18px ${FONT_FAMILY}`;
       pctx.textAlign = "center";
       pctx.textBaseline = "middle";
       drawArrow(pctx, midX, bottom - 54, midX, bottom - 20, "#6f7f8f");
@@ -2343,7 +2447,7 @@
     }
 
     function printBadge(pctx, text, x, y, size = 18) {
-      pctx.font = `${size}px Arial, sans-serif`;
+      pctx.font = `${size}px ${FONT_FAMILY}`;
       const width = pctx.measureText(text).width + size * 1.2;
       const height = size + 10;
       pctx.fillStyle = "#ffffff";
@@ -2524,6 +2628,13 @@
     }
 
     window.addEventListener("resize", resizeCanvas);
+
+    const today = new Date();
+    document.getElementById("submissionDate").value = [
+      today.getFullYear(),
+      String(today.getMonth() + 1).padStart(2, "0"),
+      String(today.getDate()).padStart(2, "0")
+    ].join("-");
 
     function loadStateFromDemo() {
       const layout = cloneLayout(demoLayout);

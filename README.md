@@ -30,6 +30,11 @@ For a non-editable snapshot of only the map, use `Export Layout JPG`. This
 downloads a flat image of the layout without the inventory pages used by
 Print / Save PDF.
 
+Before exporting a JPEG for placement submission, enter the camp and contact
+details in the JPEG Submission Details section. Those values are rendered in a
+header above the map and intentionally are not saved to browser storage, layout
+JSON, shared links, or hosted layouts.
+
 For a hosted website, there are two link options:
 
 - Use `Copy Layout Link` for a self-contained URL hash. This works for smaller
