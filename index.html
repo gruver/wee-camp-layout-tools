@@ -740,7 +740,8 @@
   <section class="print-sheet" id="printSheet"></section>
 
   <script>
-    const STORAGE_KEY = "camp-layout-planner-v1";
+    // Bump this when the seeded default layout changes so old browser autosaves do not hide it.
+    const STORAGE_KEY = "camp-layout-planner-v2";
     const FONT_FAMILY = '"IBM Plex Sans", "Helvetica Neue", Arial, sans-serif';
     const DPR = Math.max(1, window.devicePixelRatio || 1);
     const SITE_DEFAULTS = {
