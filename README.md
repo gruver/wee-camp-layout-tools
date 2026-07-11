@@ -91,6 +91,8 @@ https://YOUR_USER.github.io/wee_camp_layout_tools/?layout=layouts/draft-1.json
 - Export just the layout map as a JPG image.
 - Use Print / Save PDF to generate a layout and inventory PDF.
 - Load a starting layout from a hosted `layouts/index.json` library.
+- New hosted sessions without saved browser state load
+  `layouts/camp-layout-2026-06-21-isaac-edits.json` by default.
 
 The editable layout data is plain JSON in the browser state, so saved `.json`
 files can be versioned and reloaded later.

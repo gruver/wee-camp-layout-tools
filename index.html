@@ -382,6 +382,10 @@
       border-radius: 6px;
     }
 
+    .metric.wide {
+      grid-column: 1 / -1;
+    }
+
     .metric strong {
       display: block;
       font-size: 19px;
@@ -770,6 +774,7 @@
       vehicleShapes: "assets/VEHICLE_SHAPES.json"
     };
     const LAYOUT_LIBRARY_PATH = "layouts/index.json";
+    const DEFAULT_LAYOUT_PATH = "layouts/camp-layout-2026-06-21-isaac-edits.json";
 
     const DEFAULT_GENERIC_PIECES = [
       { label: "Black Rock shade", type: "shade", shape: "rect", width: 12, height: 20, color: "#d8a742" },
@@ -935,6 +940,7 @@
       ]
     };
 
+    let loadedSavedState = false;
     let state = loadState();
     let selectedIds = [];
     let drag = null;
@@ -1005,7 +1011,10 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
-          if (parsed && parsed.items && parsed.site) return normalizeLayout(parsed);
+          if (parsed && parsed.items && parsed.site) {
+            loadedSavedState = true;
+            return normalizeLayout(parsed);
+          }
         }
       } catch (error) {
         console.warn(error);
@@ -1973,12 +1982,45 @@
       const totalArea = state.items.reduce((sum, entry) => sum + entry.width * entry.height, 0);
       const keepoutArea = state.items.filter((entry) => entry.keepout).reduce((sum, entry) => sum + entry.width * entry.height, 0);
       const types = new Set(state.items.map((entry) => entry.type));
+      const shadeItems = state.items.filter((entry) => entry.layer === "shade");
+      const shadeRectangles = shadeRectangleInventory(shadeItems);
+      const tarpMaterialArea = shadeRectangles.reduce((sum, entry) => sum + entry.qty * entry.width * entry.height * 2, 0);
+      const shadeStructureLines = shadeRectangles.length
+        ? shadeRectangles.map((entry) => `${entry.qty} x (${formatFeet(entry.width)}x${formatFeet(entry.height)}) shade structures`).join(", ")
+        : "0 shade structures";
+      const tarpRequirementLines = shadeRectangles.length
+        ? shadeRectangles.map((entry) => `${entry.qty} shade tarps + ${entry.qty} ground tarps`).join(", ")
+        : "0 shade tarps + 0 ground tarps";
       els.summary.innerHTML = `
         <div class="metric"><strong>${state.items.length}</strong><span>Total items</span></div>
         <div class="metric"><strong>${types.size}</strong><span>Types</span></div>
         <div class="metric"><strong>${Math.round(totalArea)}</strong><span>Item sq ft</span></div>
         <div class="metric"><strong>${Math.round(keepoutArea)}</strong><span>Keepout sq ft</span></div>
+        <div class="metric wide"><strong>${shadeStructureLines}</strong><span>${tarpRequirementLines}; ${formatNumber(tarpMaterialArea)} sq ft total shade + ground covering</span></div>
       `;
+    }
+
+    function shadeRectangleInventory(shadeItems) {
+      const counts = new Map();
+      for (const entry of shadeItems) {
+        if (entry.shape !== "rect") continue;
+        const width = Number(entry.width);
+        const height = Number(entry.height);
+        if (!Number.isFinite(width) || !Number.isFinite(height)) continue;
+        const key = `${width}|${height}`;
+        const current = counts.get(key) || { width, height, qty: 0 };
+        current.qty += 1;
+        counts.set(key, current);
+      }
+      return Array.from(counts.values()).sort((a, b) => a.width - b.width || a.height - b.height);
+    }
+
+    function formatFeet(value) {
+      return Number.isInteger(value) ? String(value) : value.toFixed(1).replace(/\.0$/, "");
+    }
+
+    function formatNumber(value) {
+      return Math.round(value).toLocaleString();
     }
 
     function renderButtonStates() {
@@ -2104,9 +2146,13 @@
           await loadLayoutByPath(layoutPath);
         } else if (hashMatch) {
           applyImportedLayout(decodeLayoutHash(hashMatch[1]));
+        } else if (!loadedSavedState && window.location.protocol !== "file:") {
+          await loadLayoutByPath(DEFAULT_LAYOUT_PATH);
+          els.layoutLibraryStatus.textContent = "Loaded default Isaac edits layout.";
         }
       } catch (error) {
-        alert(`Could not load linked layout: ${error.message}`);
+        if (layoutPath || hashMatch) alert(`Could not load linked layout: ${error.message}`);
+        else console.warn(error);
       }
     }
 
