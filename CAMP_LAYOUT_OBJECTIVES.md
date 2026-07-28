@@ -107,6 +107,9 @@ Preferred:
 - Planning population: 25 people.
 - Sleeping layout should support enough tents, vans, trailers, or shared
   sleeping structures for the group.
+- Layout objects that can sleep people should carry a `sleepCapacity` value so
+  the editor can total planned sleeping capacity and show the number on the
+  object label.
 - Common infrastructure should assume repeated daily use by 25 people.
 - Circulation paths should support people carrying water, food bins, bikes,
   shade hardware, and trash without threading through private sleeping areas.
@@ -133,6 +136,8 @@ Preferred:
 - Is fuel separated from kitchen and dense sleeping areas?
 - Are kitchen, shade, and sleeping zones connected by clear paths?
 - Are large vehicles and trailers realistically placed?
+- Does the total sleeping capacity meet or exceed the 25-person planning
+  target?
 - Does the layout still work if site dimensions shift by a few feet?
 - Are sun and shade assumptions visible in the exported plan?
 - Does the inventory match the current design assumptions?

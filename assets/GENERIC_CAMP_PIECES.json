@@ -33,7 +33,8 @@
       "shape": "rect",
       "width": 8,
       "height": 8,
-      "color": "#5f8f5b"
+      "color": "#5f8f5b",
+      "sleepCapacity": 4
     },
     {
       "label": "Hexayurt",
@@ -41,7 +42,8 @@
       "shape": "rect",
       "width": 12,
       "height": 14,
-      "color": "#76a98f"
+      "color": "#76a98f",
+      "sleepCapacity": 2
     },
     {
       "label": "Sprinter van",

@@ -7,6 +7,10 @@ This directory holds reusable toolbox assets for the camp layout editor.
 - `VEHICLE_SHAPES.json`: 2026-specific constrained vehicle, trailer, and
   infrastructure shapes derived from the vehicle constraints notes.
 
+Templates may include `sleepCapacity` for tents, yurts, RVs, vans, trailers,
+or any other object that can sleep people. A value of `0` or a missing value
+means the object does not add to the sleeping-capacity total until edited.
+
 Layouts under `../layouts/` are saved camp configurations. Assets in this
 directory are reusable source templates for adding new objects to a layout.
 

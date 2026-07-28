@@ -76,8 +76,8 @@ https://YOUR_USER.github.io/wee_camp_layout_tools/?layout=layouts/draft-1.json
 - Generic camp pieces include common vehicles, bike racks, generator areas,
   fire rings, Elephant Mutant Vehicle parking, shade, tents, kitchen, fuel,
   water, and keepout objects.
-- Edit label, type, dimensions, position, rotation, color, notes, lock state,
-  and keepout/access-zone status.
+- Edit label, type, dimensions, position, rotation, color, sleeping capacity,
+  notes, lock state, and keepout/access-zone status.
 - Assign objects to named layers. The current layers are `ground`,
   `infrastructure`, and `shade`; ground draws first, infrastructure draws next,
   and shade draws above it translucently.
@@ -85,7 +85,8 @@ https://YOUR_USER.github.io/wee_camp_layout_tools/?layout=layouts/draft-1.json
 - Duplicate repeated shapes such as tents or shade tarps.
 - Group and ungroup selected objects.
 - Snap moving object edges/centers to other objects and site edges.
-- View a live inventory and area summary.
+- View a live inventory, area summary, shade tarp summary, and sleeping
+  capacity total.
 - Autosave in browser local storage.
 - Export/import the editable layout as JSON.
 - Export just the layout map as a JPG image.

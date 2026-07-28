@@ -37,7 +37,8 @@ The layout state is plain JSON:
 - `placement`: address and orientation metadata such as frontage, mountain
   direction, Man direction, camp bearing, and sun path.
 - `items`: every placed object, including geometry, position, rotation, label,
-  type, layer, color, keepout status, lock status, group membership, and notes.
+  type, layer, color, sleeping capacity, keepout status, lock status, group
+  membership, and notes.
 - `groups`: logical clusters of item IDs that should move together.
 - `options`: user-facing display and editing toggles.
 - `view`: current canvas pan and zoom.
@@ -85,8 +86,9 @@ Right sidebar:
 
 - Selection inspector for editing one selected object.
 - Rotation buttons for coarse 90 degree turns and fine 5 degree adjustments.
-- Inventory table with counts, dimensions, and item types.
-- Summary metrics for item count, type count, total area, and keepout area.
+- Inventory table with counts, dimensions, sleeping capacity, and item types.
+- Summary metrics for item count, type count, total area, keepout area, shade
+  tarp needs, and total sleeping capacity.
 
 ## Interaction Model
 
