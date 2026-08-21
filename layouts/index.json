@@ -2,9 +2,39 @@
   "version": 1,
   "layouts": [
     {
+      "label": "2026-08-06 vehicle colored by arrival",
+      "path": "layouts/camp-layout-2026-08-06-vehicle-colored-by-arrival.json",
+      "description": "Layout with vehicles colored by playa arrival date (27 Aug cyan-blue through 3 Sep). Hand-built by Isaac. 53 items, 17 vehicles."
+    },
+    {
+      "label": "2026-08-06 vehicle colored by arrival 2",
+      "path": "layouts/camp-layout-2026-08-06-vehicle-colored-by-arrival-2.json",
+      "description": "Second variant — vehicles colored by arrival date. Hand-built by Isaac. 53 items, 17 vehicles."
+    },
+    {
+      "label": "2026-08-06 block of shade",
+      "path": "layouts/camp-layout-2026-08-06-block-of-shade.json",
+      "description": "Layout featuring a consolidated block of shade. Hand-built by Isaac. 53 items, 17 vehicles, 9 shade."
+    },
+    {
+      "label": "2026-08-19 Option A — reworked roster",
+      "path": "layouts/camp-layout-2026-08-19-option-A.json",
+      "description": "Regenerated from reworked vehicle roster with residential/arrival columns. 7 residential vehicles near tents; non-residential form walls. Box truck + HHC pinned east for morning shade. MV flush to frontage. Tents back, 1ft gutter, 8 shade sections. Fuel 31ft. 52 items."
+    },
+    {
+      "label": "2026-08-19 Option B — solar variant",
+      "path": "layouts/camp-layout-2026-08-19-option-B.json",
+      "description": "Same base as Option A plus Jeb & Rissa tent + minivan in a south-facing frontage solar slot. Fuel 28ft. 52 items."
+    },
+    {
+      "label": "2026-08-19 vehicle & tent refresh (early)",
+      "path": "layouts/camp-layout-2026-08-19-vehicle-tent-refresh.json",
+      "description": "Early 47-item option from the rosters before art cars, gutters, or the truck/trailer wall. Reference/alternative."
+    },
+    {
       "label": "2026 Isaac edits layout",
       "path": "layouts/camp-layout-2026-06-21-isaac-edits.json",
-      "description": "Default 150 ft x 150 ft Delphi & 3:45 working layout with Isaac edits."
+      "description": "Earlier 150 x 150 Delphi & 3:45 working layout with Isaac edits (pre roster refresh)."
     }
   ]
 }

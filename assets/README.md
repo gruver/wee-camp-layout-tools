@@ -6,6 +6,8 @@ This directory holds reusable toolbox assets for the camp layout editor.
   tents, vehicles, kitchen, fuel, fire ring, and parking zones.
 - `VEHICLE_SHAPES.json`: 2026-specific constrained vehicle, trailer, and
   infrastructure shapes derived from the vehicle constraints notes.
+- `TENT_SHAPES.json`: named tent shapes derived from the tent constraints
+  notes, with name-derived sleeping capacity.
 
 Templates may include `sleepCapacity` for tents, yurts, RVs, vans, trailers,
 or any other object that can sleep people. A value of `0` or a missing value
