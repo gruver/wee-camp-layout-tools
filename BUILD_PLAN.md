@@ -38,9 +38,13 @@ The layout state is plain JSON:
   direction, Man direction, camp bearing, and sun path.
 - `items`: every placed object, including geometry, position, rotation, label,
   type, layer, color, sleeping capacity, keepout status, lock status, group
-  membership, and notes.
+  membership, notes, and arrival/departure timestamps (`arrivesAt`,
+  `departsAt`; empty means unconstrained).
 - `groups`: logical clusters of item IDs that should move together.
 - `options`: user-facing display and editing toggles.
+- `timeline`: camp-wide `buildStart` and `strikeEnd` bounds used as defaults
+  for new objects and as contributors to the time-slider range (the slider
+  spans the union of the bounds and all item timestamps).
 - `view`: current canvas pan and zoom.
 
 Toolbox assets are separate JSON files:
@@ -79,6 +83,11 @@ Center workspace:
   circles. Infrastructure is for cars, tents, trailers, racks, generators, and
   camp objects. Shade is the top layer and remains translucent.
 - Display toggles for large sun-path and afternoon-wind overlays.
+- Time slider ("Time: All" / "Time: Scrub") to move through arrival and
+  departure times: arrived objects render fully colored, future objects fade,
+  struck objects fade to a desaturated ghost. Inventory and summary recompute
+  for the selected moment. Layout version 5 migrates pre-timeline layouts by
+  backfilling missing timestamps from the timeline bounds.
 - Toolbar for selection actions, grouping, deletion, zoom, grid, and snap.
 - Bottom status readout for current view and selected object position.
 
