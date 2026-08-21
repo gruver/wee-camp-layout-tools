@@ -87,6 +87,14 @@ https://YOUR_USER.github.io/wee_camp_layout_tools/?layout=layouts/draft-1.json
 - Snap moving object edges/centers to other objects and site edges.
 - View a live inventory, area summary, shade tarp summary, and sleeping
   capacity total.
+- Assign each object an arrival/build time and a departure/strike time, then
+  scrub the Time slider to move through build week: objects that have arrived
+  render fully colored, not-yet-arrived objects fade out, and struck objects
+  fade to a desaturated ghost. Inventory and summary recompute for the
+  selected moment; exports always show the full layout.
+- Set the camp-wide build start and strike end defaults in the Site section;
+  new objects inherit them (or the current scrub time when the slider is
+  active).
 - Autosave in browser local storage.
 - Export/import the editable layout as JSON.
 - Export just the layout map as a JPG image.

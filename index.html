@@ -121,6 +121,23 @@
       box-shadow: var(--shadow);
       pointer-events: auto;
     }
+    .time-slider {
+      width: 170px;
+      min-height: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      accent-color: var(--accent);
+    }
+
+    .time-readout {
+      min-width: 148px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      text-align: center;
+    }
+
 
     button,
     input,
@@ -567,6 +584,14 @@
         Bottom edge
         <input id="edgeBottom" value="150' Street Frontage">
       </label>
+      <label>
+        Build starts
+        <input id="buildStart" type="datetime-local" value="2026-08-22T08:00">
+      </label>
+      <label>
+        Strike ends
+        <input id="strikeEnd" type="datetime-local" value="2026-09-02T12:00">
+      </label>
     </div>
     <div class="button-row">
       <button id="fitView">Fit View</button>
@@ -725,6 +750,11 @@
         <button id="toggleSun">Sun On</button>
         <button id="toggleWind">Wind On</button>
       </div>
+      <div class="toolbar-group">
+        <button id="toggleTime">Time: All</button>
+        <input id="timeSlider" class="time-slider" type="range" aria-label="Layout timeline" disabled>
+        <span id="timeReadout" class="time-readout">Full layout</span>
+      </div>
     </div>
     <div class="canvas-wrap">
       <canvas id="canvas"></canvas>
@@ -784,6 +814,11 @@
       afternoonWind: "Typical afternoon wind SW -> NE"
     };
     const LAYERS = ["ground", "infrastructure", "shade"];
+
+    const TIMELINE_DEFAULTS = {
+      buildStart: "2026-08-22T08:00",
+      strikeEnd: "2026-09-02T12:00"
+    };
 
     const TOOLBOX_ASSETS = {
       genericPieces: "assets/GENERIC_CAMP_PIECES.json",
@@ -1271,6 +1306,27 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
       ]
     };
 
+    // Seed build-week arrival/departure times so the Time slider is meaningful on first open.
+    const demoTimeline = {
+      "service-lane-1": { arrivesAt: "2026-08-22T09:00", departsAt: "2026-09-02T12:00" },
+      "site-keepout": { arrivesAt: "2026-08-22T09:00", departsAt: "2026-09-02T12:00" },
+      "van-1": { arrivesAt: "2026-08-22T14:00", departsAt: "2026-08-31T14:00" },
+      "van-2": { arrivesAt: "2026-08-23T10:00", departsAt: "2026-08-31T14:00" },
+      "kitchen-1": { arrivesAt: "2026-08-23T15:00", departsAt: "2026-09-01T15:00" },
+      "shade-2": { arrivesAt: "2026-08-23T16:00", departsAt: "2026-09-02T09:00" },
+      "shade-1": { arrivesAt: "2026-08-24T11:00", departsAt: "2026-09-02T09:00" },
+      "trailer-1": { arrivesAt: "2026-08-24T13:00", departsAt: "2026-08-31T12:00" },
+      "fuel-1": { arrivesAt: "2026-08-24T15:00", departsAt: "2026-08-31T08:00" },
+      "dome-1": { arrivesAt: "2026-08-25T10:00", departsAt: "2026-09-02T09:00" },
+      "tent-1": { arrivesAt: "2026-08-26T12:00", departsAt: "2026-08-31T16:00" },
+      "tent-2": { arrivesAt: "2026-08-26T12:00", departsAt: "2026-08-31T16:00" },
+      "tent-3": { arrivesAt: "2026-08-26T17:00", departsAt: "2026-08-31T16:00" }
+    };
+    for (const [seedId, seedTimes] of Object.entries(demoTimeline)) {
+      const seeded = demoLayout.items.find((candidate) => candidate.id === seedId);
+      if (seeded) Object.assign(seeded, seedTimes);
+    }
+
     let loadedSavedState = false;
     let state = loadState();
     let selectedIds = [];
@@ -1320,6 +1376,8 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
         sleepCapacity: supportsSleepCapacity({ type }) ? sleepCapacityValue(sleepCapacity) : 0,
         layer: defaultLayerForItem({ label, type, keepout }),
         groupId: null,
+        arrivesAt: "",
+        departsAt: "",
         notes: notes || ""
       };
     }
@@ -1364,7 +1422,7 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
 
     function normalizeLayout(layout) {
       const previousVersion = Number(layout.version || 1);
-      layout.version = Math.max(4, previousVersion);
+      layout.version = Math.max(5, previousVersion);
       layout.units = "feet";
       layout.site = {
         ...layout.site,
@@ -1377,12 +1435,28 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
         fixed: true
       };
       layout.placement = { ...PLACEMENT_DEFAULTS, ...(layout.placement || {}) };
-      layout.options = { snap: true, grid: true, showSun: true, showWind: true, ...(layout.options || {}) };
+      layout.options = { snap: true, grid: true, showSun: true, showWind: true, timeScrub: false, timeValue: "", ...(layout.options || {}) };
+      layout.timeline = {
+        buildStart: String((layout.timeline && layout.timeline.buildStart) || TIMELINE_DEFAULTS.buildStart),
+        strikeEnd: String((layout.timeline && layout.timeline.strikeEnd) || TIMELINE_DEFAULTS.strikeEnd)
+      };
       layout.groups = layout.groups || [];
       for (const entry of layout.items) {
         entry.sleepCapacity = sleepCapacityFor(entry);
+        entry.arrivesAt = String(entry.arrivesAt || "");
+        entry.departsAt = String(entry.departsAt || "");
         if (!LAYERS.includes(entry.layer) || previousVersion < 3 && entry.layer === "ground" && defaultLayerForItem(entry) === "infrastructure") {
           entry.layer = defaultLayerForItem(entry);
+        }
+      }
+      if (previousVersion < 5) {
+        // One-time migration: pre-timeline layouts get bounds-derived schedules so the
+        // time slider is usable immediately. Deliberately cleared fields in v5+ layouts stay empty.
+        const buildStart = parseTimeValue(layout.timeline.buildStart);
+        const strikeEnd = parseTimeValue(layout.timeline.strikeEnd);
+        for (const entry of layout.items) {
+          if (!parseTimeValue(entry.arrivesAt) && buildStart) entry.arrivesAt = layout.timeline.buildStart;
+          if (!parseTimeValue(entry.departsAt) && strikeEnd) entry.departsAt = layout.timeline.strikeEnd;
         }
       }
       ensureServiceLane(layout);
@@ -1393,12 +1467,104 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
       return { ...EDGE_LABEL_DEFAULTS, ...(edgeLabels || {}) };
     }
 
+    const TIME_STEP_MS = 30 * 60 * 1000;
+    const FUTURE_ITEM_ALPHA = 0.25;
+    const DEPARTED_ITEM_ALPHA = 0.32;
+
+    function parseTimeValue(value) {
+      if (!value) return null;
+      const parsed = new Date(value);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+
+    function selectedScrubTime() {
+      return state.options.timeScrub ? parseTimeValue(state.options.timeValue) : null;
+    }
+
+    function presenceAt(entry, at) {
+      if (!at) return "present";
+      const arrives = parseTimeValue(entry.arrivesAt);
+      const departs = parseTimeValue(entry.departsAt);
+      if (departs && at.getTime() >= departs.getTime()) return "departed";
+      if (arrives && at.getTime() < arrives.getTime()) return "future";
+      return "present";
+    }
+
+    function itemsPresentAt(at) {
+      return state.items.filter((entry) => presenceAt(entry, at) === "present");
+    }
+
+    function visibleItemsAtTime() {
+      const at = selectedScrubTime();
+      return at ? itemsPresentAt(at) : state.items;
+    }
+
+    function toDatetimeLocalValue(date) {
+      const pad = (value) => String(value).padStart(2, "0");
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+
+    // Pure on globals: safe to call during initial normalize before `state` is assigned.
+    function applyDefaultTimeline(entry, layout, scrubAt = null) {
+      const bounds = (layout && layout.timeline) || TIMELINE_DEFAULTS;
+      entry.arrivesAt = scrubAt ? toDatetimeLocalValue(scrubAt) : String(bounds.buildStart || "");
+      entry.departsAt = String(bounds.strikeEnd || "");
+    }
+
+    function layoutTimeRange() {
+      let min = parseTimeValue(state.timeline && state.timeline.buildStart);
+      let max = parseTimeValue(state.timeline && state.timeline.strikeEnd);
+      for (const entry of state.items) {
+        const arrives = parseTimeValue(entry.arrivesAt);
+        const departs = parseTimeValue(entry.departsAt);
+        if (arrives && (!min || arrives.getTime() < min.getTime())) min = arrives;
+        if (departs && (!max || departs.getTime() > max.getTime())) max = departs;
+      }
+      if (min && max && max.getTime() <= min.getTime()) max = new Date(min.getTime() + TIME_STEP_MS);
+      return { min, max };
+    }
+
+    function desaturateColor(color) {
+      const hex = color.replace("#", "");
+      const parts = [0, 2, 4].map((start) => parseInt(hex.slice(start, start + 2), 16));
+      const gray = Math.round(0.3 * parts[0] + 0.59 * parts[1] + 0.11 * parts[2]);
+      return "#" + parts.map((value) => Math.round(value * 0.25 + gray * 0.75).toString(16).padStart(2, "0")).join("");
+    }
+
+    function formatTimeReadout(date) {
+      return date.toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+    }
+
+    function syncTimeControls() {
+      const toggle = document.getElementById("toggleTime");
+      const slider = document.getElementById("timeSlider");
+      const readout = document.getElementById("timeReadout");
+      const { min, max } = layoutTimeRange();
+      toggle.textContent = state.options.timeScrub ? "Time: Scrub" : "Time: All";
+      if (min && max) {
+        slider.min = String(min.getTime());
+        slider.max = String(max.getTime());
+        slider.step = String(TIME_STEP_MS);
+        let at = parseTimeValue(state.options.timeValue);
+        if (at && at.getTime() < min.getTime()) at = min;
+        if (at && at.getTime() > max.getTime()) at = max;
+        if (!at) at = min;
+        state.options.timeValue = at.toISOString();
+        slider.value = String(at.getTime());
+      }
+      slider.disabled = !state.options.timeScrub || !(min && max);
+      const at = selectedScrubTime();
+      readout.textContent = at ? formatTimeReadout(at) : "Full layout";
+    }
+
     function ensureServiceLane(layout) {
       const lane = layout.items.find((entry) => entry.id === "service-lane-1");
       const laneData = item("service-lane-1", "20 ft service lane", "keepout", "rect", 0, 0, SITE_DEFAULTS.serviceLaneWidth, SITE_DEFAULTS.height, 0, "#9ea7a1", true, "Keep clear for access and service vehicles.", true);
       if (lane) {
-        Object.assign(lane, laneData);
+        const schedule = { arrivesAt: lane.arrivesAt, departsAt: lane.departsAt };
+        Object.assign(lane, laneData, schedule);
       } else {
+        applyDefaultTimeline(laneData, layout);
         layout.items.unshift(laneData);
       }
     }
@@ -1687,23 +1853,26 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
       const w = entry.width * state.view.scale;
       const h = entry.height * state.view.scale;
       const selected = selectedIds.includes(entry.id);
+      const presence = presenceAt(entry, selectedScrubTime());
+      const fadeAlpha = presence === "future" ? FUTURE_ITEM_ALPHA : presence === "departed" ? DEPARTED_ITEM_ALPHA : 1;
+      const color = presence === "departed" ? desaturateColor(entry.color) : entry.color;
       ctx.save();
       ctx.translate(center.x, center.y);
       ctx.rotate((entry.rotation || 0) * Math.PI / 180);
-      ctx.fillStyle = entry.keepout ? stripePattern(entry.color) : entry.color;
-      ctx.strokeStyle = selected ? "#111111" : shade(entry.color, -35);
+      ctx.fillStyle = entry.keepout ? stripePattern(color) : color;
+      ctx.strokeStyle = selected ? "#111111" : shade(color, -35);
       ctx.lineWidth = selected ? 2.5 : 1.2;
       if (entry.shape === "ellipse") {
         ctx.beginPath();
         ctx.ellipse(0, 0, w / 2, h / 2, 0, 0, Math.PI * 2);
-        ctx.globalAlpha = itemFillAlpha(entry);
+        ctx.globalAlpha = itemFillAlpha(entry) * fadeAlpha;
         ctx.fill();
-        ctx.globalAlpha = 1;
+        ctx.globalAlpha = fadeAlpha;
         ctx.stroke();
       } else {
-        ctx.globalAlpha = itemFillAlpha(entry);
+        ctx.globalAlpha = itemFillAlpha(entry) * fadeAlpha;
         ctx.fillRect(-w / 2, -h / 2, w, h);
-        ctx.globalAlpha = 1;
+        ctx.globalAlpha = fadeAlpha;
         ctx.strokeRect(-w / 2, -h / 2, w, h);
       }
       if (entry.locked) {
@@ -1714,10 +1883,11 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
         ctx.fillText("L", w / 2 - 14, -h / 2 + 15);
       }
       const textMax = Math.max(30, w - 8);
-      ctx.fillStyle = readableTextColor(entry.color);
+      ctx.fillStyle = readableTextColor(color);
       ctx.font = `${Math.max(10, Math.min(15, h * 0.22))}px ${FONT_FAMILY}`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
+      ctx.globalAlpha = fadeAlpha;
       const label = fitText(displayLabelForItem(entry), textMax);
       ctx.fillText(label, 0, -4);
       ctx.font = `10px ${FONT_FAMILY}`;
@@ -1978,6 +2148,7 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
       );
       entry.layer = template.layer || defaultLayerForItem(entry);
       if (template.constraintId) entry.constraintId = template.constraintId;
+      applyDefaultTimeline(entry, state, selectedScrubTime());
       state.items.push(entry);
       applySelection([entry.id], false);
       renderPalette();
@@ -2015,6 +2186,7 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
         );
         entry.layer = template.layer || defaultLayerForItem(entry);
         entry.constraintId = template.constraintId;
+        applyDefaultTimeline(entry, state, selectedScrubTime());
         state.items.push(entry);
         selected.push(entry.id);
       }
@@ -2202,6 +2374,7 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
 
     function renderPanels() {
       renderSiteControls();
+      syncTimeControls();
       renderSelectionPanel();
       renderInventory();
       renderSummary();
@@ -2217,6 +2390,8 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
       els.edgeRight.value = state.site.edgeLabels.right;
       els.edgeBottom.value = state.site.edgeLabels.bottom;
       els.edgeLeft.value = state.site.edgeLabels.left;
+      document.getElementById("buildStart").value = state.timeline.buildStart;
+      document.getElementById("strikeEnd").value = state.timeline.strikeEnd;
       document.getElementById("toggleSnap").textContent = state.options.snap ? "Snap On" : "Snap Off";
       document.getElementById("toggleGrid").textContent = state.options.grid ? "Grid On" : "Grid Off";
       document.getElementById("toggleSun").textContent = state.options.showSun !== false ? "Sun On" : "Sun Off";
@@ -2267,6 +2442,8 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
         <label>Width ft<input data-field="width" type="number" min="1" step="0.5" value="${entry.width}"></label>
         <label>Depth ft<input data-field="height" type="number" min="1" step="0.5" value="${entry.height}"></label>
         <label>Rotation deg<input data-field="rotation" type="number" step="15" value="${entry.rotation || 0}"></label>
+        <label>Arrives<input data-field="arrivesAt" type="datetime-local" value="${escapeAttr(entry.arrivesAt || "")}"></label>
+        <label>Departs<input data-field="departsAt" type="datetime-local" value="${escapeAttr(entry.departsAt || "")}"></label>
         ${supportsSleepCapacity(entry) ? `<label>Sleeps<input data-field="sleepCapacity" type="number" min="0" step="1" value="${sleepCapacityFor(entry)}"></label>` : ""}
         <label>Color<input data-field="color" type="color" value="${entry.color}"></label>
         <div class="rotation-controls full">
@@ -2328,6 +2505,7 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
         if (field === "type") entry.sleepCapacity = sleepCapacityFor(entry);
       }
       if (field === "type") renderSelectionPanel();
+      syncTimeControls();
       renderInventory();
       renderSummary();
       saveSoon();
@@ -2337,7 +2515,7 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
     function renderInventory() {
       els.inventory.innerHTML = "";
       const counts = new Map();
-      for (const entry of state.items.slice().sort(compareItemsForDrawing)) {
+      for (const entry of visibleItemsAtTime().slice().sort(compareItemsForDrawing)) {
         const key = `${entry.label}|${entry.type}|${entry.width}|${entry.height}|${sleepCapacityFor(entry)}`;
         const current = counts.get(key) || { ...entry, qty: 0 };
         current.qty += 1;
@@ -2355,7 +2533,7 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
           <span>${entry.qty}</span>
         `;
         row.addEventListener("click", () => {
-          const matching = state.items
+          const matching = visibleItemsAtTime()
             .filter((candidate) => candidate.label === entry.label && candidate.type === entry.type && candidate.width === entry.width && candidate.height === entry.height && sleepCapacityFor(candidate) === sleepCapacityFor(entry))
             .map((candidate) => candidate.id);
           applySelection(matching, false);
@@ -2366,21 +2544,27 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
     }
 
     function renderSummary() {
-      const totalArea = state.items.reduce((sum, entry) => sum + entry.width * entry.height, 0);
-      const keepoutArea = state.items.filter((entry) => entry.keepout).reduce((sum, entry) => sum + entry.width * entry.height, 0);
-      const types = new Set(state.items.map((entry) => entry.type));
-      const shadeItems = state.items.filter((entry) => entry.layer === "shade");
+      const at = selectedScrubTime();
+      const items = at ? itemsPresentAt(at) : state.items;
+      const totalArea = items.reduce((sum, entry) => sum + entry.width * entry.height, 0);
+      const keepoutArea = items.filter((entry) => entry.keepout).reduce((sum, entry) => sum + entry.width * entry.height, 0);
+      const types = new Set(items.map((entry) => entry.type));
+      const shadeItems = items.filter((entry) => entry.layer === "shade");
       const shadeRectangles = shadeRectangleInventory(shadeItems);
       const tarpMaterialArea = shadeRectangles.reduce((sum, entry) => sum + entry.qty * entry.width * entry.height * 2, 0);
-      const sleepingCapacity = state.items.reduce((sum, entry) => sum + sleepCapacityFor(entry), 0);
+      const sleepingCapacity = items.reduce((sum, entry) => sum + sleepCapacityFor(entry), 0);
       const shadeStructureLines = shadeRectangles.length
         ? shadeRectangles.map((entry) => `${entry.qty} x (${formatFeet(entry.width)}x${formatFeet(entry.height)}) shade structures`).join(", ")
         : "0 shade structures";
       const tarpRequirementLines = shadeRectangles.length
         ? shadeRectangles.map((entry) => `${entry.qty} shade tarps + ${entry.qty} ground tarps`).join(", ")
         : "0 shade tarps + 0 ground tarps";
+      const timelineMetric = at
+        ? `<div class="metric wide"><strong>${escapeText(formatTimeReadout(at))}</strong><span>Timeline view: ${items.length} of ${state.items.length} items present</span></div>`
+        : "";
       els.summary.innerHTML = `
-        <div class="metric"><strong>${state.items.length}</strong><span>Total items</span></div>
+        ${timelineMetric}
+        <div class="metric"><strong>${items.length}</strong><span>Total items</span></div>
         <div class="metric"><strong>${types.size}</strong><span>Types</span></div>
         <div class="metric"><strong>${Math.round(totalArea)}</strong><span>Item sq ft</span></div>
         <div class="metric"><strong>${Math.round(keepoutArea)}</strong><span>Keepout sq ft</span></div>
@@ -2610,6 +2794,7 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
           capacity
         );
         entry.rosterImportKey = unit.key;
+        applyDefaultTimeline(entry, state, selectedScrubTime());
         state.items.push(entry);
         imported.push(entry.id);
       }
@@ -2752,7 +2937,7 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
 
     function newEmptyLayout() {
       state = normalizeLayout({
-        version: 4,
+        version: 5,
         units: "feet",
         site: { ...SITE_DEFAULTS, edgeLabels: { ...EDGE_LABEL_DEFAULTS } },
         placement: { ...PLACEMENT_DEFAULTS },
@@ -3217,6 +3402,35 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
       saveSoon();
       draw();
     });
+    document.getElementById("toggleTime").addEventListener("click", () => {
+      if (!state.options.timeScrub) {
+        const { min, max } = layoutTimeRange();
+        if (!min || !max) {
+          alert("No items have arrival or departure times yet. Select an item and set Arrives or Departs in the selection panel.");
+          return;
+        }
+        state.options.timeScrub = true;
+        if (!parseTimeValue(state.options.timeValue)) state.options.timeValue = min.toISOString();
+      } else {
+        state.options.timeScrub = false;
+      }
+      syncTimeControls();
+      renderPanels();
+      saveSoon();
+      draw();
+    });
+    document.getElementById("timeSlider").addEventListener("input", (event) => {
+      if (event.target.disabled) return;
+      const value = Number(event.target.value);
+      if (!Number.isFinite(value)) return;
+      state.options.timeScrub = true;
+      state.options.timeValue = new Date(value).toISOString();
+      syncTimeControls();
+      renderInventory();
+      renderSummary();
+      saveSoon();
+      draw();
+    });
     document.getElementById("selectAll").addEventListener("click", () => applySelection(state.items.map((entry) => entry.id), false));
     document.getElementById("loadConstraintVehicles").addEventListener("click", loadConstraintVehicles);
     document.getElementById("loadTentShapes").addEventListener("click", loadTentShapes);
@@ -3274,6 +3488,18 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
           bottom: els.edgeBottom.value,
           left: els.edgeLeft.value
         };
+        saveSoon();
+        draw();
+      });
+    }
+
+    for (const id of ["buildStart", "strikeEnd"]) {
+      document.getElementById(id).addEventListener("input", () => {
+        state.timeline.buildStart = document.getElementById("buildStart").value;
+        state.timeline.strikeEnd = document.getElementById("strikeEnd").value;
+        syncTimeControls();
+        renderInventory();
+        renderSummary();
         saveSoon();
         draw();
       });
