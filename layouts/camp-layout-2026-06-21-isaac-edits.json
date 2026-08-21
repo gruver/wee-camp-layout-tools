@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 5,
   "units": "feet",
   "site": {
     "width": 150,
@@ -37,7 +37,9 @@
       "locked": true,
       "groupId": null,
       "notes": "Keep clear for access and service vehicles.",
-      "layer": "ground"
+      "layer": "ground",
+      "arrivesAt": "2026-08-22T08:00",
+      "departsAt": "2026-09-02T12:00"
     },
     {
       "id": "site-keepout",
@@ -54,7 +56,9 @@
       "locked": false,
       "groupId": null,
       "notes": "Leave this open for refills and service access.",
-      "layer": "ground"
+      "layer": "ground",
+      "arrivesAt": "2026-08-22T08:00",
+      "departsAt": "2026-09-02T12:00"
     },
     {
       "id": "fuel-1",
@@ -71,7 +75,9 @@
       "locked": false,
       "groupId": null,
       "notes": "Downwind edge, away from kitchen.",
-      "layer": "infrastructure"
+      "layer": "infrastructure",
+      "arrivesAt": "2026-08-24T09:00",
+      "departsAt": "2026-08-31T08:00"
     },
     {
       "id": "trailer-1",
@@ -88,7 +94,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "infrastructure"
+      "layer": "infrastructure",
+      "arrivesAt": "2026-08-23T10:00",
+      "departsAt": "2026-09-01T15:00"
     },
     {
       "id": "dome-1",
@@ -105,7 +113,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "shade"
+      "layer": "shade",
+      "arrivesAt": "2026-08-23T14:00",
+      "departsAt": "2026-09-02T09:00"
     },
     {
       "id": "tent-1",
@@ -122,7 +132,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "infrastructure"
+      "layer": "infrastructure",
+      "arrivesAt": "2026-08-26T10:00",
+      "departsAt": "2026-08-31T16:00"
     },
     {
       "id": "tent-2",
@@ -139,7 +151,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "infrastructure"
+      "layer": "infrastructure",
+      "arrivesAt": "2026-08-26T12:00",
+      "departsAt": "2026-08-31T16:00"
     },
     {
       "id": "tent-3",
@@ -156,7 +170,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "infrastructure"
+      "layer": "infrastructure",
+      "arrivesAt": "2026-08-26T12:00",
+      "departsAt": "2026-08-31T16:00"
     },
     {
       "id": "shade-mqla89p3",
@@ -173,7 +189,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "shade"
+      "layer": "shade",
+      "arrivesAt": "2026-08-23T09:00",
+      "departsAt": "2026-09-02T09:00"
     },
     {
       "id": "shade-mqla89p4",
@@ -190,7 +208,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "shade"
+      "layer": "shade",
+      "arrivesAt": "2026-08-23T10:00",
+      "departsAt": "2026-09-02T09:00"
     },
     {
       "id": "shade-mqla89p5",
@@ -207,7 +227,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "shade"
+      "layer": "shade",
+      "arrivesAt": "2026-08-23T10:00",
+      "departsAt": "2026-09-02T09:00"
     },
     {
       "id": "shade-mqla89p6",
@@ -224,7 +246,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "shade"
+      "layer": "shade",
+      "arrivesAt": "2026-08-23T11:00",
+      "departsAt": "2026-09-02T09:00"
     },
     {
       "id": "vehicle-mqlpsod9",
@@ -241,7 +265,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "infrastructure"
+      "layer": "infrastructure",
+      "arrivesAt": "2026-08-22T13:00",
+      "departsAt": "2026-09-02T10:00"
     },
     {
       "id": "vehicle-team-cargo-trailer",
@@ -259,7 +285,9 @@
       "groupId": null,
       "notes": "45 ft x 9 ft cargo trailer plus 6 ft stair/access allowance, modeled as 45 ft x 15 ft effective footprint. Confirm stair side and access geometry.",
       "constraintId": "vehicle-team-cargo-trailer",
-      "layer": "infrastructure"
+      "layer": "infrastructure",
+      "arrivesAt": "2026-08-22T13:00",
+      "departsAt": "2026-09-02T10:00"
     },
     {
       "id": "vehicle-ash-sprinter",
@@ -277,7 +305,9 @@
       "groupId": null,
       "notes": "20 ft Sprinter van. Width TBD; modeled as 8 ft until confirmed.",
       "constraintId": "vehicle-ash-sprinter",
-      "layer": "infrastructure"
+      "layer": "infrastructure",
+      "arrivesAt": "2026-08-25T09:00",
+      "departsAt": "2026-08-31T12:00"
     },
     {
       "id": "other-mqmvupsn",
@@ -294,7 +324,9 @@
       "locked": false,
       "groupId": null,
       "notes": "40 ft diameter parking zone for Elephant Mutant Vehicle.",
-      "layer": "shade"
+      "layer": "shade",
+      "arrivesAt": "2026-08-27T09:00",
+      "departsAt": "2026-08-30T18:00"
     },
     {
       "id": "vehicle-mqn8s5ep",
@@ -311,7 +343,9 @@
       "locked": false,
       "layer": "infrastructure",
       "groupId": null,
-      "notes": "Generic SUV footprint based on a Toyota 4Runner, rounded for layout planning."
+      "notes": "Generic SUV footprint based on a Toyota 4Runner, rounded for layout planning.",
+      "arrivesAt": "2026-08-25T12:00",
+      "departsAt": "2026-08-31T14:00"
     },
     {
       "id": "vehicle-mqn8s5er",
@@ -328,7 +362,9 @@
       "locked": false,
       "layer": "infrastructure",
       "groupId": null,
-      "notes": "Generic SUV footprint based on a Toyota 4Runner, rounded for layout planning."
+      "notes": "Generic SUV footprint based on a Toyota 4Runner, rounded for layout planning.",
+      "arrivesAt": "2026-08-25T12:00",
+      "departsAt": "2026-08-31T14:00"
     },
     {
       "id": "vehicle-mqn8s5es",
@@ -345,7 +381,9 @@
       "locked": false,
       "layer": "infrastructure",
       "groupId": null,
-      "notes": "Generic SUV footprint based on a Toyota 4Runner, rounded for layout planning."
+      "notes": "Generic SUV footprint based on a Toyota 4Runner, rounded for layout planning.",
+      "arrivesAt": "2026-08-25T13:00",
+      "departsAt": "2026-08-31T14:00"
     },
     {
       "id": "vehicle-mqn9uwe1",
@@ -362,7 +400,9 @@
       "locked": false,
       "layer": "infrastructure",
       "groupId": null,
-      "notes": "Generic SUV footprint based on a Toyota 4Runner, rounded for layout planning."
+      "notes": "Generic SUV footprint based on a Toyota 4Runner, rounded for layout planning.",
+      "arrivesAt": "2026-08-25T13:00",
+      "departsAt": "2026-08-31T14:00"
     },
     {
       "id": "vehicle-ryan-sprinter-carport",
@@ -380,7 +420,9 @@
       "layer": "infrastructure",
       "groupId": null,
       "notes": "Sprinter van and carport kept together as a 20 ft x 20 ft compound footprint. Confirm carport orientation and door-side clearance.",
-      "constraintId": "vehicle-ryan-sprinter-carport"
+      "constraintId": "vehicle-ryan-sprinter-carport",
+      "arrivesAt": "2026-08-25T10:00",
+      "departsAt": "2026-08-31T12:00"
     },
     {
       "id": "vehicle-mqn9uwe2",
@@ -397,7 +439,9 @@
       "locked": false,
       "layer": "infrastructure",
       "groupId": null,
-      "notes": "Generic sedan footprint based on a Toyota Prius, rounded for layout planning."
+      "notes": "Generic sedan footprint based on a Toyota Prius, rounded for layout planning.",
+      "arrivesAt": "2026-08-25T13:00",
+      "departsAt": "2026-08-31T14:00"
     },
     {
       "id": "vehicle-mqn9uwe3",
@@ -414,7 +458,9 @@
       "locked": false,
       "layer": "infrastructure",
       "groupId": null,
-      "notes": "Generic sedan footprint based on a Toyota Prius, rounded for layout planning."
+      "notes": "Generic sedan footprint based on a Toyota Prius, rounded for layout planning.",
+      "arrivesAt": "2026-08-25T14:00",
+      "departsAt": "2026-08-31T14:00"
     },
     {
       "id": "other-mqna50do",
@@ -431,7 +477,9 @@
       "locked": false,
       "layer": "ground",
       "groupId": null,
-      "notes": "15 ft diameter fire ring safety zone. Actual fire pit is 24 in x 30 in at center; chairs can be inside the ring, but keep other items away."
+      "notes": "15 ft diameter fire ring safety zone. Actual fire pit is 24 in x 30 in at center; chairs can be inside the ring, but keep other items away.",
+      "arrivesAt": "2026-08-24T14:00",
+      "departsAt": "2026-09-01T18:00"
     },
     {
       "id": "vehicle-mqna50dp",
@@ -448,7 +496,9 @@
       "locked": false,
       "layer": "infrastructure",
       "groupId": null,
-      "notes": ""
+      "notes": "",
+      "arrivesAt": "2026-08-25T16:00",
+      "departsAt": "2026-08-31T15:00"
     },
     {
       "id": "vehicle-aidan-camper-van",
@@ -466,7 +516,9 @@
       "layer": "infrastructure",
       "groupId": null,
       "notes": "22 ft camper van. Width TBD; modeled as 8 ft until confirmed.",
-      "constraintId": "vehicle-aidan-camper-van"
+      "constraintId": "vehicle-aidan-camper-van",
+      "arrivesAt": "2026-08-25T11:00",
+      "departsAt": "2026-08-31T12:00"
     },
     {
       "id": "shade-mqna50dq",
@@ -483,7 +535,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "shade"
+      "layer": "shade",
+      "arrivesAt": "2026-08-23T11:00",
+      "departsAt": "2026-09-02T09:00"
     },
     {
       "id": "shade-mqna50dr",
@@ -500,7 +554,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "shade"
+      "layer": "shade",
+      "arrivesAt": "2026-08-23T12:00",
+      "departsAt": "2026-09-02T09:00"
     },
     {
       "id": "shade-mqna50ds",
@@ -517,7 +573,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "shade"
+      "layer": "shade",
+      "arrivesAt": "2026-08-23T12:00",
+      "departsAt": "2026-09-02T09:00"
     },
     {
       "id": "shade-mqna50dt",
@@ -534,7 +592,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "shade"
+      "layer": "shade",
+      "arrivesAt": "2026-08-23T13:00",
+      "departsAt": "2026-09-02T09:00"
     },
     {
       "id": "vehicle-loren-rommel",
@@ -552,7 +612,9 @@
       "layer": "infrastructure",
       "groupId": null,
       "notes": "Toyota Tacoma 18 ft plus 16 ft trailer, modeled as combined 34 ft x 8 ft placeholder. Confirm width and whether truck/trailer can detach.",
-      "constraintId": "vehicle-loren-rommel"
+      "constraintId": "vehicle-loren-rommel",
+      "arrivesAt": "2026-08-22T14:00",
+      "departsAt": "2026-09-02T10:00"
     },
     {
       "id": "tent-mqna50du",
@@ -569,7 +631,9 @@
       "locked": false,
       "layer": "infrastructure",
       "groupId": null,
-      "notes": ""
+      "notes": "",
+      "arrivesAt": "2026-08-26T13:00",
+      "departsAt": "2026-08-31T16:00"
     },
     {
       "id": "vehicle-jeb-rissa-solar",
@@ -587,7 +651,9 @@
       "layer": "infrastructure",
       "groupId": null,
       "notes": "12 ft x 12 ft south-facing lower-shade footprint. Needs clear sun exposure for solar panels. Confirm whether this is vehicle, trailer, or standalone solar setup.",
-      "constraintId": "vehicle-jeb-rissa-solar"
+      "constraintId": "vehicle-jeb-rissa-solar",
+      "arrivesAt": "2026-08-24T15:00",
+      "departsAt": "2026-09-01T10:00"
     },
     {
       "id": "other-mqna50dv",
@@ -604,7 +670,9 @@
       "locked": false,
       "layer": "ground",
       "groupId": null,
-      "notes": "40 ft diameter parking zone for Elephant Mutant Vehicle."
+      "notes": "40 ft diameter parking zone for Elephant Mutant Vehicle.",
+      "arrivesAt": "2026-08-27T10:00",
+      "departsAt": "2026-08-30T18:00"
     },
     {
       "id": "tent-mqna50dw",
@@ -621,7 +689,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "infrastructure"
+      "layer": "infrastructure",
+      "arrivesAt": "2026-08-26T14:00",
+      "departsAt": "2026-08-31T16:00"
     },
     {
       "id": "tent-mqna50dx",
@@ -638,7 +708,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "infrastructure"
+      "layer": "infrastructure",
+      "arrivesAt": "2026-08-26T14:00",
+      "departsAt": "2026-08-31T16:00"
     },
     {
       "id": "fuel-mqna50dy",
@@ -655,7 +727,9 @@
       "locked": false,
       "layer": "infrastructure",
       "groupId": null,
-      "notes": ""
+      "notes": "",
+      "arrivesAt": "2026-08-24T10:00",
+      "departsAt": "2026-08-31T07:00"
     },
     {
       "id": "fuel-mqna50dz",
@@ -672,7 +746,9 @@
       "locked": false,
       "layer": "infrastructure",
       "groupId": null,
-      "notes": ""
+      "notes": "",
+      "arrivesAt": "2026-08-24T10:00",
+      "departsAt": "2026-08-31T07:00"
     },
     {
       "id": "tent-mqnc0b7y",
@@ -689,7 +765,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "infrastructure"
+      "layer": "infrastructure",
+      "arrivesAt": "2026-08-26T15:00",
+      "departsAt": "2026-08-31T16:00"
     },
     {
       "id": "tent-mqnc0b7z",
@@ -706,7 +784,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "infrastructure"
+      "layer": "infrastructure",
+      "arrivesAt": "2026-08-26T15:00",
+      "departsAt": "2026-08-31T16:00"
     },
     {
       "id": "vehicle-mqnc0b80",
@@ -723,7 +803,9 @@
       "locked": false,
       "layer": "infrastructure",
       "groupId": null,
-      "notes": "Generic SUV footprint based on a Toyota 4Runner, rounded for layout planning."
+      "notes": "Generic SUV footprint based on a Toyota 4Runner, rounded for layout planning.",
+      "arrivesAt": "2026-08-25T14:00",
+      "departsAt": "2026-08-31T14:00"
     },
     {
       "id": "shade-mqnc0b81",
@@ -740,7 +822,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "shade"
+      "layer": "shade",
+      "arrivesAt": "2026-08-23T13:00",
+      "departsAt": "2026-09-02T09:00"
     },
     {
       "id": "shade-mqnc0b82",
@@ -757,7 +841,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "shade"
+      "layer": "shade",
+      "arrivesAt": "2026-08-23T13:00",
+      "departsAt": "2026-09-02T09:00"
     },
     {
       "id": "vehicle-alice-rv",
@@ -775,7 +861,9 @@
       "layer": "infrastructure",
       "groupId": null,
       "notes": "30 ft RV. Width, slide-outs, awning, door side, and access needs TBD; modeled as 30 ft x 10 ft placeholder.",
-      "constraintId": "vehicle-alice-rv"
+      "constraintId": "vehicle-alice-rv",
+      "arrivesAt": "2026-08-22T15:00",
+      "departsAt": "2026-09-02T09:00"
     },
     {
       "id": "tent-mqnc0b83",
@@ -792,7 +880,9 @@
       "locked": false,
       "groupId": null,
       "notes": "",
-      "layer": "infrastructure"
+      "layer": "infrastructure",
+      "arrivesAt": "2026-08-26T14:00",
+      "departsAt": "2026-08-31T16:00"
     },
     {
       "id": "kitchen-mqnc0b84",
@@ -809,7 +899,9 @@
       "locked": false,
       "groupId": null,
       "notes": "Coolers, gear boxes, etc (no high-value tools)",
-      "layer": "infrastructure"
+      "layer": "infrastructure",
+      "arrivesAt": "2026-08-23T15:00",
+      "departsAt": "2026-09-01T15:00"
     },
     {
       "id": "vehicle-mqnc0b86",
@@ -826,7 +918,9 @@
       "locked": false,
       "layer": "infrastructure",
       "groupId": null,
-      "notes": "Generic sedan footprint based on a Toyota Prius, rounded for layout planning."
+      "notes": "Generic sedan footprint based on a Toyota Prius, rounded for layout planning.",
+      "arrivesAt": "2026-08-25T14:00",
+      "departsAt": "2026-08-31T14:00"
     },
     {
       "id": "vehicle-mqnc0b87",
@@ -843,7 +937,9 @@
       "locked": false,
       "layer": "infrastructure",
       "groupId": null,
-      "notes": "Generic sedan footprint based on a Toyota Prius, rounded for layout planning."
+      "notes": "Generic sedan footprint based on a Toyota Prius, rounded for layout planning.",
+      "arrivesAt": "2026-08-25T15:00",
+      "departsAt": "2026-08-31T14:00"
     },
     {
       "id": "vehicle-mqncx6st",
@@ -860,7 +956,9 @@
       "locked": false,
       "layer": "infrastructure",
       "groupId": null,
-      "notes": "Generic sedan footprint based on a Toyota Prius, rounded for layout planning."
+      "notes": "Generic sedan footprint based on a Toyota Prius, rounded for layout planning.",
+      "arrivesAt": "2026-08-25T15:00",
+      "departsAt": "2026-08-31T14:00"
     },
     {
       "id": "vehicle-mqncx6su",
@@ -877,7 +975,9 @@
       "locked": false,
       "layer": "infrastructure",
       "groupId": null,
-      "notes": ""
+      "notes": "",
+      "arrivesAt": "2026-08-25T16:00",
+      "departsAt": "2026-08-31T15:00"
     }
   ],
   "placement": {
@@ -888,5 +988,9 @@
     "mountainDirection": "Street frontage",
     "sunPath": "East to west across the plan",
     "afternoonWind": "Typical afternoon wind SW -> NE"
+  },
+  "timeline": {
+    "buildStart": "2026-08-22T08:00",
+    "strikeEnd": "2026-09-02T12:00"
   }
 }
