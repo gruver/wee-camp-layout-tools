@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "units": "feet",
   "site": {
     "width": 150,
@@ -156,7 +156,9 @@
       "constraintId": "vehicle-ryan-rudy-carport",
       "owner": "Ryan & Rudy",
       "residential": true,
-      "arrival": "3 Sep"
+      "arrival": "3 Sep",
+      "arrivesAt": "2026-09-03T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "vehicle-team-hhc-trailer-stairs",
@@ -178,7 +180,9 @@
       "constraintId": "vehicle-team-hhc-trailer-stairs",
       "owner": "HHC Trailer & Stairs",
       "residential": false,
-      "arrival": "27 Aug"
+      "arrival": "27 Aug",
+      "arrivesAt": "2026-08-27T12:00",
+      "departsAt": "2026-09-08T10:00"
     },
     {
       "id": "vehicle-team-box-truck",
@@ -200,7 +204,9 @@
       "constraintId": "vehicle-team-box-truck",
       "owner": "Box Truck",
       "residential": false,
-      "arrival": "27 Aug"
+      "arrival": "27 Aug",
+      "arrivesAt": "2026-08-27T12:00",
+      "departsAt": "2026-09-08T10:00"
     },
     {
       "id": "tent-garret",
@@ -220,7 +226,9 @@
       "layer": "infrastructure",
       "sleepCapacity": 1,
       "constraintId": "tent-garret",
-      "owner": "Garret"
+      "owner": "Garret",
+      "arrivesAt": "2026-08-31T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "tent-jeb-rissa",
@@ -240,7 +248,9 @@
       "layer": "infrastructure",
       "sleepCapacity": 2,
       "constraintId": "tent-jeb-rissa",
-      "owner": "Jeb & Rissa"
+      "owner": "Jeb & Rissa",
+      "arrivesAt": "2026-08-27T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "tent-brendan",
@@ -260,7 +270,9 @@
       "layer": "infrastructure",
       "sleepCapacity": 1,
       "constraintId": "tent-brendan",
-      "owner": "Brendan"
+      "owner": "Brendan",
+      "arrivesAt": "2026-08-27T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "tent-matty",
@@ -280,7 +292,9 @@
       "layer": "infrastructure",
       "sleepCapacity": 1,
       "constraintId": "tent-matty",
-      "owner": "Matty"
+      "owner": "Matty",
+      "arrivesAt": "2026-09-03T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "tent-caley",
@@ -300,7 +314,9 @@
       "layer": "infrastructure",
       "sleepCapacity": 1,
       "constraintId": "tent-caley",
-      "owner": "Caley"
+      "owner": "Caley",
+      "arrivesAt": "2026-08-27T12:00",
+      "departsAt": "2026-09-08T10:00"
     },
     {
       "id": "tent-daniel-nipul-brandon",
@@ -320,7 +336,9 @@
       "layer": "infrastructure",
       "sleepCapacity": 3,
       "constraintId": "tent-daniel-nipul-brandon",
-      "owner": "Daniel & Nipul & Brandon"
+      "owner": "Daniel & Nipul & Brandon",
+      "arrivesAt": "2026-09-01T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "tent-ian",
@@ -340,7 +358,9 @@
       "layer": "infrastructure",
       "sleepCapacity": 1,
       "constraintId": "tent-ian",
-      "owner": "Ian"
+      "owner": "Ian",
+      "arrivesAt": "2026-08-31T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "tent-jake",
@@ -360,7 +380,9 @@
       "layer": "infrastructure",
       "sleepCapacity": 1,
       "constraintId": "tent-jake",
-      "owner": "Jake"
+      "owner": "Jake",
+      "arrivesAt": "2026-08-27T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "tent-johnny",
@@ -380,7 +402,9 @@
       "layer": "infrastructure",
       "sleepCapacity": 1,
       "constraintId": "tent-johnny",
-      "owner": "Johnny"
+      "owner": "Johnny",
+      "arrivesAt": "2026-08-27T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "tent-reid",
@@ -400,7 +424,9 @@
       "layer": "infrastructure",
       "sleepCapacity": 1,
       "constraintId": "tent-reid",
-      "owner": "Reid"
+      "owner": "Reid",
+      "arrivesAt": "2026-09-03T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "tent-emily-colin",
@@ -420,7 +446,9 @@
       "layer": "infrastructure",
       "sleepCapacity": 2,
       "constraintId": "tent-emily-colin",
-      "owner": "Emily & Colin"
+      "owner": "Emily & Colin",
+      "arrivesAt": "2026-08-28T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "tent-heather-isaac",
@@ -440,7 +468,9 @@
       "layer": "infrastructure",
       "sleepCapacity": 2,
       "constraintId": "tent-heather-isaac",
-      "owner": "Heather & Isaac"
+      "owner": "Heather & Isaac",
+      "arrivesAt": "2026-08-27T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "tent-mike",
@@ -460,7 +490,9 @@
       "layer": "infrastructure",
       "sleepCapacity": 1,
       "constraintId": "tent-mike",
-      "owner": "Mike"
+      "owner": "Mike",
+      "arrivesAt": "2026-08-31T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "tent-nick-ellen",
@@ -480,7 +512,9 @@
       "layer": "infrastructure",
       "sleepCapacity": 2,
       "constraintId": "tent-nick-ellen",
-      "owner": "Nick & Ellen"
+      "owner": "Nick & Ellen",
+      "arrivesAt": "2026-09-04T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "tent-gene",
@@ -500,7 +534,9 @@
       "layer": "infrastructure",
       "sleepCapacity": 1,
       "constraintId": "tent-gene",
-      "owner": "Gene"
+      "owner": "Gene",
+      "arrivesAt": "2026-09-04T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "shade-0",
@@ -666,7 +702,9 @@
       "constraintId": "vehicle-loren-tacoma-trailer",
       "owner": "Loren",
       "residential": true,
-      "arrival": "27 Aug"
+      "arrival": "27 Aug",
+      "arrivesAt": "2026-08-27T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "vehicle-jt-rick-carport",
@@ -688,7 +726,9 @@
       "constraintId": "vehicle-jt-rick-carport",
       "owner": "JT & Rick",
       "residential": true,
-      "arrival": "29 Aug"
+      "arrival": "29 Aug",
+      "arrivesAt": "2026-08-29T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "vehicle-alex-emma-tacoma-trailer",
@@ -710,7 +750,9 @@
       "constraintId": "vehicle-alex-emma-tacoma-trailer",
       "owner": "Alex & Emma",
       "residential": true,
-      "arrival": "29 Aug"
+      "arrival": "29 Aug",
+      "arrivesAt": "2026-08-29T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "vehicle-ashley-camper-van",
@@ -732,7 +774,9 @@
       "constraintId": "vehicle-ashley-camper-van",
       "owner": "Ashley",
       "residential": true,
-      "arrival": "29 Aug"
+      "arrival": "29 Aug",
+      "arrivesAt": "2026-08-29T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "vehicle-aidan-camper-van",
@@ -754,7 +798,9 @@
       "constraintId": "vehicle-aidan-camper-van",
       "owner": "Aidan",
       "residential": true,
-      "arrival": "31 Aug"
+      "arrival": "31 Aug",
+      "arrivesAt": "2026-08-31T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "vehicle-chloe-gabriel-camper-van",
@@ -776,7 +822,9 @@
       "constraintId": "vehicle-chloe-gabriel-camper-van",
       "owner": "Chloe & Gabriel",
       "residential": true,
-      "arrival": "31 Aug"
+      "arrival": "31 Aug",
+      "arrivesAt": "2026-08-31T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "kitchen-tent-1",
@@ -888,7 +936,9 @@
       "constraintId": "vehicle-daniel-truck",
       "owner": "Daniel",
       "residential": false,
-      "arrival": "1 Sep"
+      "arrival": "1 Sep",
+      "arrivesAt": "2026-09-01T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "vehicle-johnny-tacoma",
@@ -910,7 +960,9 @@
       "constraintId": "vehicle-johnny-tacoma",
       "owner": "Johnny",
       "residential": false,
-      "arrival": "27 Aug"
+      "arrival": "27 Aug",
+      "arrivesAt": "2026-08-27T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "vehicle-mike-sienna",
@@ -932,7 +984,9 @@
       "constraintId": "vehicle-mike-sienna",
       "owner": "Mike",
       "residential": false,
-      "arrival": "31 Aug"
+      "arrival": "31 Aug",
+      "arrivesAt": "2026-08-31T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "vehicle-jeb-rissa-minivan",
@@ -954,7 +1008,9 @@
       "constraintId": "vehicle-jeb-rissa-minivan",
       "owner": "Jeb & Rissa",
       "residential": false,
-      "arrival": "27 Aug"
+      "arrival": "27 Aug",
+      "arrivesAt": "2026-08-27T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "vehicle-nick-ellen-jeep",
@@ -976,7 +1032,9 @@
       "constraintId": "vehicle-nick-ellen-jeep",
       "owner": "Nick & Ellen",
       "residential": false,
-      "arrival": "3 Sep"
+      "arrival": "3 Sep",
+      "arrivesAt": "2026-09-04T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "vehicle-emily-colin-subaru",
@@ -998,7 +1056,9 @@
       "constraintId": "vehicle-emily-colin-subaru",
       "owner": "Emily & Colin",
       "residential": false,
-      "arrival": "28 Aug"
+      "arrival": "28 Aug",
+      "arrivesAt": "2026-08-28T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "vehicle-heather-isaac-4runner",
@@ -1020,7 +1080,9 @@
       "constraintId": "vehicle-heather-isaac-4runner",
       "owner": "Heather & Isaac",
       "residential": false,
-      "arrival": "27 Aug"
+      "arrival": "27 Aug",
+      "arrivesAt": "2026-08-27T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "vehicle-ian-van",
@@ -1042,7 +1104,9 @@
       "constraintId": "vehicle-ian-van",
       "owner": "Ian",
       "residential": false,
-      "arrival": "31 Aug"
+      "arrival": "31 Aug",
+      "arrivesAt": "2026-08-31T12:00",
+      "departsAt": "2026-09-07T10:00"
     },
     {
       "id": "fuel-storage-1",
@@ -1078,7 +1142,9 @@
       "sleepCapacity": 1,
       "layer": "infrastructure",
       "groupId": null,
-      "notes": ""
+      "notes": "",
+      "arrivesAt": "2026-08-29T12:00",
+      "departsAt": "2026-09-07T10:00"
     }
   ],
   "placement": {
@@ -1091,5 +1157,9 @@
     "bearingReference": "3:45 is 157.5 deg when 4:30 is 180 deg south",
     "sunPath": "East to west across the plan",
     "afternoonWind": "Typical afternoon wind SW -> NE"
+  },
+  "timeline": {
+    "buildStart": "2026-08-27T08:00",
+    "strikeEnd": "2026-09-08T12:00"
   }
 }
