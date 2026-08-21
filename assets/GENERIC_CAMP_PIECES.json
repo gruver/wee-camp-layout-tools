@@ -20,12 +20,13 @@
       "color": "#d8a742"
     },
     {
-      "label": "10x20 shade",
+      "label": "Black Rock shade section",
       "type": "shade",
       "shape": "rect",
-      "width": 20,
-      "height": 10,
-      "color": "#d8a742"
+      "width": 12,
+      "height": 20,
+      "color": "#d8a742",
+      "notes": "Camp Black Rock shade section is 12 ft x 20 ft."
     },
     {
       "label": "4-person tent",
