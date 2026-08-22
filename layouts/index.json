@@ -2,6 +2,11 @@
   "version": 1,
   "layouts": [
     {
+      "label": "Wee final (2026)",
+      "path": "layouts/camp-layout-2026-wee-final.json",
+      "description": "Final 2026 layout. 58 items: 17 vehicles, 17 tents, 11 shade, 3 fuel; Elephant MV and Funklet parking, Jeb & Rissa solar zone, 4 groups. Timeline 27 Aug build start through 8 Sep strike end."
+    },
+    {
       "label": "21 Aug final",
       "path": "layouts/camp-layout-21-aug-final.json",
       "description": "Final hand-refined layout exported from the editor (2026-08-21). 58 items: 17 vehicles, 16 tents, 12 shade incl. Aidan's 3x 10x8 sections and Alice's 15x15 tent placed out of the main shade block."
