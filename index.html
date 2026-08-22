@@ -751,7 +751,13 @@
         <button id="toggleWind">Wind On</button>
       </div>
       <div class="toolbar-group">
-        <button id="toggleTime">Time: All</button>
+        <select id="scrubStep" aria-label="Time scrub step">
+          <option value="">Full layout</option>
+          <option value="30">&#177;30 min</option>
+          <option value="60">&#177;1 hr</option>
+          <option value="360">&#177;6 hr</option>
+          <option value="1440">&#177;1 day</option>
+        </select>
         <input id="timeSlider" class="time-slider" type="range" aria-label="Layout timeline" disabled>
         <span id="timeReadout" class="time-readout">Full layout</span>
       </div>
@@ -796,6 +802,7 @@
       snap: 2,
       serviceLaneWidth: 20
     };
+    const DEFAULT_SCRUB_STEP_MINUTES = 30;
     const EDGE_LABEL_DEFAULTS = {
       top: "150' Neighbor",
       right: "150' Neighbor",
@@ -1435,7 +1442,9 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
         fixed: true
       };
       layout.placement = { ...PLACEMENT_DEFAULTS, ...(layout.placement || {}) };
-      layout.options = { snap: true, grid: true, showSun: true, showWind: true, timeScrub: false, timeValue: "", ...(layout.options || {}) };
+      layout.options = { snap: true, grid: true, showSun: true, showWind: true, scrubStep: 0, timeValue: "", ...(layout.options || {}) };
+      if (!(layout.options.scrubStep > 0)) layout.options.scrubStep = layout.options.timeScrub ? DEFAULT_SCRUB_STEP_MINUTES : 0;
+      delete layout.options.timeScrub;
       layout.timeline = {
         buildStart: String((layout.timeline && layout.timeline.buildStart) || TIMELINE_DEFAULTS.buildStart),
         strikeEnd: String((layout.timeline && layout.timeline.strikeEnd) || TIMELINE_DEFAULTS.strikeEnd)
@@ -1478,7 +1487,7 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
     }
 
     function selectedScrubTime() {
-      return state.options.timeScrub ? parseTimeValue(state.options.timeValue) : null;
+      return state.options.scrubStep > 0 ? parseTimeValue(state.options.timeValue) : null;
     }
 
     function presenceAt(entry, at) {
@@ -1536,11 +1545,11 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
     }
 
     function syncTimeControls() {
-      const toggle = document.getElementById("toggleTime");
+      const stepSelect = document.getElementById("scrubStep");
       const slider = document.getElementById("timeSlider");
       const readout = document.getElementById("timeReadout");
       const { min, max } = layoutTimeRange();
-      toggle.textContent = state.options.timeScrub ? "Time: Scrub" : "Time: All";
+      stepSelect.value = state.options.scrubStep > 0 ? String(state.options.scrubStep) : "";
       if (min && max) {
         slider.min = String(min.getTime());
         slider.max = String(max.getTime());
@@ -1552,7 +1561,7 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
         state.options.timeValue = at.toISOString();
         slider.value = String(at.getTime());
       }
-      slider.disabled = !state.options.timeScrub || !(min && max);
+      slider.disabled = !(state.options.scrubStep > 0) || !(min && max);
       const at = selectedScrubTime();
       readout.textContent = at ? formatTimeReadout(at) : "Full layout";
     }
@@ -2059,6 +2068,19 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
           entry.y += dy;
         }
       }
+    }
+    function nudgeSelection(dx, dy) {
+      const ids = new Set();
+      for (const id of selectedIds) {
+        const entry = byId(id);
+        if (!entry) continue;
+        ids.add(id);
+        if (entry.groupId) {
+          for (const groupId of groupIds(entry.groupId)) ids.add(groupId);
+        }
+      }
+      const step = Math.max(1, state.site.snap || SITE_DEFAULTS.snap);
+      moveItems(Array.from(ids), dx * step, dy * step);
     }
 
     function snapDelta(ids) {
@@ -3402,20 +3424,52 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
       saveSoon();
       draw();
     });
-    document.getElementById("toggleTime").addEventListener("click", () => {
-      if (!state.options.timeScrub) {
-        const { min, max } = layoutTimeRange();
-        if (!min || !max) {
+    document.getElementById("scrubStep").addEventListener("change", (event) => {
+      const minutes = Number(event.target.value);
+      state.options.scrubStep = Number.isFinite(minutes) && minutes > 0 ? minutes : 0;
+      if (state.options.scrubStep > 0) {
+        const { min } = layoutTimeRange();
+        if (!min) {
           alert("No items have arrival or departure times yet. Select an item and set Arrives or Departs in the selection panel.");
-          return;
+          state.options.scrubStep = 0;
+        } else if (!parseTimeValue(state.options.timeValue)) {
+          state.options.timeValue = min.toISOString();
         }
-        state.options.timeScrub = true;
-        if (!parseTimeValue(state.options.timeValue)) state.options.timeValue = min.toISOString();
-      } else {
-        state.options.timeScrub = false;
       }
       syncTimeControls();
       renderPanels();
+      saveSoon();
+      draw();
+    });
+    document.addEventListener("keydown", (event) => {
+      const key = event.key;
+      const isArrow = key === "ArrowLeft" || key === "ArrowRight" || key === "ArrowUp" || key === "ArrowDown";
+      if (!isArrow) return;
+      const target = event.target;
+      if (target && target !== document.body && !(target.closest && target.closest(".canvas-wrap"))) return;
+      if (selectedIds.length) {
+        event.preventDefault();
+        nudgeSelection(
+          key === "ArrowLeft" ? -1 : key === "ArrowRight" ? 1 : 0,
+          key === "ArrowUp" ? -1 : key === "ArrowDown" ? 1 : 0
+        );
+        saveSoon();
+        renderPanels();
+        draw();
+        return;
+      }
+      if (!(state.options.scrubStep > 0) || (key !== "ArrowLeft" && key !== "ArrowRight")) return;
+      const { min, max } = layoutTimeRange();
+      if (!min || !max) return;
+      const at = parseTimeValue(state.options.timeValue) || min;
+      const delta = (key === "ArrowRight" ? 1 : -1) * state.options.scrubStep * 60 * 1000;
+      const next = Math.max(min.getTime(), Math.min(max.getTime(), at.getTime() + delta));
+      if (next === at.getTime()) return;
+      event.preventDefault();
+      state.options.timeValue = new Date(next).toISOString();
+      syncTimeControls();
+      renderInventory();
+      renderSummary();
       saveSoon();
       draw();
     });
@@ -3423,7 +3477,6 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
       if (event.target.disabled) return;
       const value = Number(event.target.value);
       if (!Number.isFinite(value)) return;
-      state.options.timeScrub = true;
       state.options.timeValue = new Date(value).toISOString();
       syncTimeControls();
       renderInventory();

@@ -15,8 +15,15 @@ first-class.
   an existing scrub position or change present-counts. Editable in the Site
   section; normalized with `TIMELINE_DEFAULTS` (defined BEFORE the
   `let state = loadState()` initializer — see TDZ note below).
-- `state.options.timeScrub` (bool) + `state.options.timeValue` (ISO string)
-  persist the slider state through autosave and JSON export.
+- `state.options.scrubStep` (minutes: 0 = full layout, else 30/60/360/1440) +
+  `state.options.timeValue` (ISO string) persist the slider state through
+  autosave and JSON export. The toolbar dropdown (`#scrubStep`) picks the
+  step; 0 disables the slider. Normalize migrates legacy `timeScrub: true`
+  to `DEFAULT_SCRUB_STEP_MINUTES` (declared above the boot initializer).
+  Arrow Left/Right scrub by one step when nothing is selected; with a
+  selection, all four arrows nudge by snap size (`nudgeSelection`), groups
+  included. Up/Down never scrub — the Left/Right branch is gated explicitly
+  so vertical keys fall through.
 
 ## Presence Semantics
 
