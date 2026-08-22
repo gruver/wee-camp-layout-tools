@@ -1564,6 +1564,7 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
         slider.value = String(at.getTime());
       }
       const scrubActive = state.options.scrubStep > 0 && !!(min && max);
+      slider.disabled = !scrubActive;
       document.getElementById("timeBack").disabled = !scrubActive;
       document.getElementById("timeForward").disabled = !scrubActive;
       const at = selectedScrubTime();
