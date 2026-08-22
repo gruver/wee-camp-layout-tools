@@ -758,7 +758,9 @@
           <option value="360">&#177;6 hr</option>
           <option value="1440">&#177;1 day</option>
         </select>
+        <button id="timeBack" aria-label="Step time back" disabled>&#9664;</button>
         <input id="timeSlider" class="time-slider" type="range" aria-label="Layout timeline" disabled>
+        <button id="timeForward" aria-label="Step time forward" disabled>&#9654;</button>
         <span id="timeReadout" class="time-readout">Full layout</span>
       </div>
     </div>
@@ -1561,9 +1563,28 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
         state.options.timeValue = at.toISOString();
         slider.value = String(at.getTime());
       }
-      slider.disabled = !(state.options.scrubStep > 0) || !(min && max);
+      const scrubActive = state.options.scrubStep > 0 && !!(min && max);
+      document.getElementById("timeBack").disabled = !scrubActive;
+      document.getElementById("timeForward").disabled = !scrubActive;
       const at = selectedScrubTime();
       readout.textContent = at ? formatTimeReadout(at) : "Full layout";
+    }
+
+    function stepScrubTime(direction) {
+      if (!(state.options.scrubStep > 0)) return false;
+      const { min, max } = layoutTimeRange();
+      if (!min || !max) return false;
+      const at = parseTimeValue(state.options.timeValue) || min;
+      const delta = direction * state.options.scrubStep * 60 * 1000;
+      const next = Math.max(min.getTime(), Math.min(max.getTime(), at.getTime() + delta));
+      if (next === at.getTime()) return false;
+      state.options.timeValue = new Date(next).toISOString();
+      syncTimeControls();
+      renderInventory();
+      renderSummary();
+      saveSoon();
+      draw();
+      return true;
     }
 
     function ensureServiceLane(layout) {
@@ -3458,21 +3479,11 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
         draw();
         return;
       }
-      if (!(state.options.scrubStep > 0) || (key !== "ArrowLeft" && key !== "ArrowRight")) return;
-      const { min, max } = layoutTimeRange();
-      if (!min || !max) return;
-      const at = parseTimeValue(state.options.timeValue) || min;
-      const delta = (key === "ArrowRight" ? 1 : -1) * state.options.scrubStep * 60 * 1000;
-      const next = Math.max(min.getTime(), Math.min(max.getTime(), at.getTime() + delta));
-      if (next === at.getTime()) return;
-      event.preventDefault();
-      state.options.timeValue = new Date(next).toISOString();
-      syncTimeControls();
-      renderInventory();
-      renderSummary();
-      saveSoon();
-      draw();
+      if (key !== "ArrowLeft" && key !== "ArrowRight") return;
+      if (stepScrubTime(key === "ArrowRight" ? 1 : -1)) event.preventDefault();
     });
+    document.getElementById("timeBack").addEventListener("click", () => stepScrubTime(-1));
+    document.getElementById("timeForward").addEventListener("click", () => stepScrubTime(1));
     document.getElementById("timeSlider").addEventListener("input", (event) => {
       if (event.target.disabled) return;
       const value = Number(event.target.value);

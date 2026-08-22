@@ -20,10 +20,12 @@ first-class.
   autosave and JSON export. The toolbar dropdown (`#scrubStep`) picks the
   step; 0 disables the slider. Normalize migrates legacy `timeScrub: true`
   to `DEFAULT_SCRUB_STEP_MINUTES` (declared above the boot initializer).
-  Arrow Left/Right scrub by one step when nothing is selected; with a
-  selection, all four arrows nudge by snap size (`nudgeSelection`), groups
-  included. Up/Down never scrub — the Left/Right branch is gated explicitly
-  so vertical keys fall through.
+  Arrow Left/Right scrub by one step when nothing is selected, as do the
+  ◀/▶ buttons beside the slider (`#timeBack`/`#timeForward`, both routed
+  through the shared `stepScrubTime(direction)` helper and disabled when
+  scrub is off). With a selection, all four arrows nudge by snap size
+  (`nudgeSelection`), groups included. Up/Down never scrub — the Left/Right
+  branch is gated explicitly so vertical keys fall through.
 
 ## Presence Semantics
 
