@@ -2,6 +2,16 @@
   "version": 1,
   "layouts": [
     {
+      "label": "21 Aug final",
+      "path": "layouts/camp-layout-21-aug-final.json",
+      "description": "Final hand-refined layout exported from the editor (2026-08-21). 58 items: 17 vehicles, 16 tents, 12 shade incl. Aidan's 3x 10x8 sections and Alice's 15x15 tent placed out of the main shade block."
+    },
+    {
+      "label": "2026-08-21 one — block-of-shade + latest metadata",
+      "path": "layouts/camp-layout-2026-08-21-one.json",
+      "description": "Derived from the 2026-08-06 block-of-shade hand layout, upgraded with current metadata: shade sections corrected to 12x20, Aidan's 3x 10x8 shade strung between his camper and Chloe & Gabriel's, Alice tent (15x15) out of the shade block but near it, Johnny/Jeb & Rissa no-shade notes, arrival dates carried only in structured fields. Geometry otherwise untouched (hand-placed). 57 items."
+    },
+    {
       "label": "2026-08-06 vehicle colored by arrival",
       "path": "layouts/camp-layout-2026-08-06-vehicle-colored-by-arrival.json",
       "description": "Layout with vehicles colored by playa arrival date (27 Aug cyan-blue through 3 Sep). Hand-built by Isaac. 53 items, 17 vehicles."
