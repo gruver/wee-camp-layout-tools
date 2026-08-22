@@ -128,6 +128,25 @@ Preferred:
   specific edge.
 - Whether there are known neighbor, road, or survey constraints once on playa.
 
+## Roster-Driven Open Items (2026-08-19)
+
+- **Population target needs revisiting.** The planning assumption is 25 people,
+  but the current vehicle/tent roster sums to 33 individuals (counting
+  `&`-joined names). Sleeping capacity in the generated layout, counting tents
+  only, is 21. The gap between 33 and 21 is the 11 people with a vehicle but
+  no separate tent entry (likely vehicle sleepers, unconfirmed).
+- **Alice has no shelter data.** Both her vehicle row (`VEHICLE_RAW_NOTES.md`)
+  and her tent row (`TENT_RAW_NOTES.md`) are completely blank. She is not
+  placed in the generated layout and her sleeping arrangement is unresolved.
+- **Vehicle-sleeper head counts are not confirmed.** The 11 vehicle owners
+  with no tent entry — Aidan, Alex & Emma, Ashley, Chloe & Gabriel, JT & Rick,
+  Loren, Ryan & Rudy — are inferred to sleep in their vehicles from their
+  vehicle descriptions, but no raw-notes field states a sleeping mode. Their
+  sleeping capacity must be confirmed before counting toward the 25-person
+  target.
+- **Ian and Matty have tents but no vehicle dimensions (TBD),** so their
+  arrival/transport is unresolved even though their sleeping is placed.
+
 ## Layout Review Checklist
 
 - Does the plan preserve the 20 ft service lane?
@@ -146,3 +165,9 @@ Preferred:
 
 - 2026-06-19: Initial objectives and constraints captured from placement
   directive and current planning assumptions.
+- 2026-08-19: Refreshed the layout from an updated vehicle roster
+  (`VEHICLE_RAW_NOTES.md`) and a new tent roster (`TENT_RAW_NOTES.md`).
+  Generated a fresh 150 ft x 150 ft layout
+  (`layouts/camp-layout-2026-08-19-vehicle-tent-refresh.json`) with 16 named
+  vehicles and 15 named tents, a fuel position isolated from kitchen/fire/tents,
+  and a 12 ft clear frontage buffer. Added the roster-driven open items above.

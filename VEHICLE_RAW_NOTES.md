@@ -6,15 +6,34 @@ and uncertainty are all useful.
 
 ## Paste Area
 
-- Loren Rommel: My Toyota Tacoma is 18'. My trailer is 16'. Im a total of 34'
-- Ash: 20 foot sprinter van
-- Ryan: Sprinter van and a carport next to it, total dimension 20' x 20'
-- Aidan: 22 foot camper van
-- Jeb and Rissa: 12ft x 12ft, south facing, less shade so solar panels get clear sun exposure
-- Alice: 30 ft RV
-- Eyal: 12' trailer
-- Team: Box truck, 35 feet
-- Team: 45 ft x 9 ft, Cargo trailer with additional 6 ft for access stairs
+Arrival	Residental?	Vehicle	L	H
+27 August	FALSE	Box Truck	26	9
+27 August	FALSE	HHC Trailer & Stairs	45	12
+31 August	TRUE	Aidan	22	8
+29 August	TRUE	Alex & Emma	34	8
+		Alice	-	-
+29 August	TRUE	Ashley	22	8
+		Brandon	-	-
+		Brendan	-	-
+		Caley	-	-
+31 August	TRUE	Chloe & Gabriel	22	8
+1 September	FALSE	Daniel	22	10
+28 August	FALSE	Emily & Colin	15	8
+		Garret	-	-
+		Gene	-	-
+27 August	FALSE	Heather & Isaac	17	7
+31 August	FALSE	Ian	16	6
+		Jake	-	-
+27 August	FALSE	Jeb & Rissa	16	8
+27 August	FALSE	Johnny	19	8
+29 August	TRUE	JT & Rick	20 20
+27 August	TRUE	Loren	34	8
+		Matty		
+31 August	FALSE	Mike	18	8
+3 September	FALSE	Nick & Ellen	18	7
+		Nipul	-	-
+		Reid	-	-
+3 September	TRUE	Ryan & Rudy	20 20
 
 
 

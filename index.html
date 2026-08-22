@@ -614,6 +614,12 @@
     </div>
     <div class="palette" id="constraintPalette"></div>
 
+    <h2>2026 Tent Shapes</h2>
+    <div class="button-row">
+      <button id="loadTentShapes" class="primary">Load Tent Shapes</button>
+    </div>
+    <div class="palette" id="tentPalette"></div>
+
     <h2>Custom Shape</h2>
     <div class="form-grid">
       <label class="full">
@@ -816,15 +822,16 @@
 
     const TOOLBOX_ASSETS = {
       genericPieces: "assets/GENERIC_CAMP_PIECES.json",
-      vehicleShapes: "assets/VEHICLE_SHAPES.json"
+      vehicleShapes: "assets/VEHICLE_SHAPES.json",
+      tentShapes: "assets/TENT_SHAPES.json"
     };
     const LAYOUT_LIBRARY_PATH = "layouts/index.json";
-    const DEFAULT_LAYOUT_PATH = "layouts/camp-layout-2026-06-21-isaac-edits.json";
+    const DEFAULT_LAYOUT_PATH = "layouts/camp-layout-2026-08-19-vehicle-tent-refresh.json";
 
     const DEFAULT_GENERIC_PIECES = [
       { label: "Black Rock shade", type: "shade", shape: "rect", width: 12, height: 20, color: "#d8a742" },
       { label: "10x10 shade", type: "shade", shape: "rect", width: 10, height: 10, color: "#d8a742" },
-      { label: "10x20 shade", type: "shade", shape: "rect", width: 20, height: 10, color: "#d8a742" },
+      { label: "Black Rock shade section (12x20)", type: "shade", shape: "rect", width: 12, height: 20, color: "#d8a742" },
       { label: "4-person tent", type: "tent", shape: "rect", width: 8, height: 8, color: "#5f8f5b", sleepCapacity: 4 },
       { label: "Hexayurt", type: "tent", shape: "rect", width: 12, height: 14, color: "#76a98f", sleepCapacity: 2 },
       { label: "Sprinter van", type: "vehicle", shape: "rect", width: 22, height: 8, color: "#5377b0" },
@@ -843,119 +850,433 @@
       { label: "Elephant MV parking", type: "other", shape: "ellipse", width: 40, height: 40, color: "#4f9f5f", layer: "ground", notes: "40 ft diameter parking zone for Elephant Mutant Vehicle." }
     ];
 
-    const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
-      {
-        constraintId: "vehicle-loren-rommel",
-        label: "Loren Tacoma + trailer",
-        type: "vehicle",
-        shape: "rect",
-        width: 34,
-        height: 8,
-        color: "#5f6f83",
-        x: 24,
-        y: 62,
-        notes: "Toyota Tacoma 18 ft plus 16 ft trailer, modeled as combined 34 ft x 8 ft placeholder. Confirm width and whether truck/trailer can detach."
-      },
-      {
-        constraintId: "vehicle-ash-sprinter",
-        label: "Ash Sprinter",
-        type: "vehicle",
-        shape: "rect",
-        width: 20,
-        height: 8,
-        color: "#5377b0",
-        x: 62,
-        y: 62,
-        notes: "20 ft Sprinter van. Width TBD; modeled as 8 ft until confirmed."
-      },
-      {
-        constraintId: "vehicle-ryan-sprinter-carport",
-        label: "Ryan van + carport",
-        type: "vehicle",
-        shape: "rect",
-        width: 20,
-        height: 20,
-        color: "#597ca8",
-        x: 86,
-        y: 62,
-        notes: "Sprinter van and carport kept together as a 20 ft x 20 ft compound footprint. Confirm carport orientation and door-side clearance."
-      },
+const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
       {
         constraintId: "vehicle-aidan-camper-van",
         label: "Aidan camper van",
+        owner: "Aidan",
         type: "vehicle",
         shape: "rect",
         width: 22,
         height: 8,
         color: "#5377b0",
-        x: 110,
-        y: 62,
-        notes: "22 ft camper van. Width TBD; modeled as 8 ft until confirmed."
+        x: 124,
+        y: 2,
+        notes: "22 ft x 8 ft camper van, from updated vehicle notes. No separate tent entry for Aidan in tent notes; sleeping arrangement not explicitly stated, treat as TBD."
       },
       {
-        constraintId: "vehicle-alice-rv",
-        label: "Alice RV",
+        constraintId: "vehicle-ashley-camper-van",
+        label: "Ashley camper van",
+        owner: "Ashley",
         type: "vehicle",
         shape: "rect",
-        width: 30,
-        height: 10,
-        color: "#7d7188",
-        x: 24,
-        y: 86,
-        notes: "30 ft RV. Width, slide-outs, awning, door side, and access needs TBD; modeled as 30 ft x 10 ft placeholder."
-      },
-      {
-        constraintId: "vehicle-eyal-trailer",
-        label: "Eyal trailer",
-        type: "vehicle",
-        shape: "rect",
-        width: 12,
+        width: 22,
         height: 8,
-        color: "#7b697c",
-        x: 58,
-        y: 86,
-        notes: "12 ft trailer. Width, tow vehicle, detach status, and sleeping use TBD."
+        color: "#5377b0",
+        x: 124,
+        y: 12,
+        notes: "22 ft x 8 ft camper van, from updated vehicle notes. No separate tent entry for Ashley; sleeping arrangement not explicitly stated, treat as TBD."
+      },
+      {
+        constraintId: "vehicle-chloe-gabriel-camper-van",
+        label: "Chloe & Gabriel camper van",
+        owner: "Chloe & Gabriel",
+        type: "vehicle",
+        shape: "rect",
+        width: 22,
+        height: 8,
+        color: "#5377b0",
+        x: 124,
+        y: 22,
+        notes: "22 ft x 8 ft camper van (Gabe's), from updated vehicle notes. No separate tent entry; sleeping arrangement not explicitly stated, treat as TBD."
+      },
+      {
+        constraintId: "vehicle-alex-emma-tacoma-trailer",
+        label: "Alex & Emma Tacoma + trailer",
+        owner: "Alex & Emma",
+        type: "vehicle",
+        shape: "rect",
+        width: 34,
+        height: 8,
+        color: "#5f6f83",
+        x: 116,
+        y: 2,
+        notes: "34 ft combined Tacoma + trailer, from updated vehicle notes. Width, detach status, and sleeping use TBD."
+      },
+      {
+        constraintId: "vehicle-loren-tacoma-trailer",
+        label: "Loren Tacoma + trailer",
+        owner: "Loren",
+        type: "vehicle",
+        shape: "rect",
+        width: 34,
+        height: 8,
+        color: "#5f6f83",
+        x: 106,
+        y: 2,
+        notes: "34 ft combined Tacoma + trailer, from updated vehicle notes. Width, detach status, and sleeping use TBD."
+      },
+      {
+        constraintId: "vehicle-jt-rick-carport",
+        label: "JT & Rick van/truck + dumpster carport",
+        owner: "JT & Rick",
+        type: "vehicle",
+        shape: "rect",
+        width: 40,
+        height: 40,
+        color: "#597ca8",
+        x: 22,
+        y: 2,
+        notes: "40 ft x 40 ft compound van/truck + dumpster carport footprint, from updated vehicle notes. Treat as a fixed compound footprint; confirm orientation and access side."
+      },
+      {
+        constraintId: "vehicle-ryan-rudy-carport",
+        label: "Ryan & Rudy van/truck + dumpster carport",
+        owner: "Ryan & Rudy",
+        type: "vehicle",
+        shape: "rect",
+        width: 40,
+        height: 40,
+        color: "#597ca8",
+        x: 64,
+        y: 2,
+        notes: "40 ft x 40 ft compound van/truck + dumpster carport footprint, from updated vehicle notes. Treat as a fixed compound footprint; confirm orientation and access side."
+      },
+      {
+        constraintId: "vehicle-daniel-truck",
+        label: "Daniel full-size truck",
+        owner: "Daniel",
+        type: "vehicle",
+        shape: "rect",
+        width: 22,
+        height: 10,
+        color: "#6b7785",
+        x: 22,
+        y: 44,
+        notes: "22 ft x 10 ft full-size truck, from updated vehicle notes."
+      },
+      {
+        constraintId: "vehicle-emily-colin-subaru",
+        label: "Emily & Colin's Subaru wagon",
+        owner: "Emily & Colin",
+        type: "vehicle",
+        shape: "rect",
+        width: 15,
+        height: 8,
+        color: "#7a8792",
+        x: 46,
+        y: 44,
+        notes: "15 ft x 8 ft Subaru hatchback/wagon (Caley's, driven by Emily & Colin), from updated vehicle notes."
+      },
+      {
+        constraintId: "vehicle-heather-isaac-4runner",
+        label: "Heather & Isaac 4Runner",
+        owner: "Heather & Isaac",
+        type: "vehicle",
+        shape: "rect",
+        width: 17,
+        height: 7,
+        color: "#66788f",
+        x: 63,
+        y: 44,
+        notes: "17 ft x 7 ft Toyota 4Runner, from updated vehicle notes."
+      },
+      {
+        constraintId: "vehicle-jeb-rissa-minivan",
+        label: "Jeb & Rissa minivan",
+        owner: "Jeb & Rissa",
+        type: "vehicle",
+        shape: "rect",
+        width: 16,
+        height: 8,
+        color: "#6b7785",
+        x: 82,
+        y: 44,
+        notes: "16 ft x 8 ft minivan, from updated vehicle notes. Prior solar-orientation assumption removed; no longer stated in current notes."
+      },
+      {
+        constraintId: "vehicle-johnny-tacoma",
+        label: "Johnny Tacoma pickup",
+        owner: "Johnny",
+        type: "vehicle",
+        shape: "rect",
+        width: 19,
+        height: 8,
+        color: "#6b7785",
+        x: 100,
+        y: 44,
+        notes: "19 ft x 8 ft Toyota Tacoma pickup, from updated vehicle notes."
+      },
+      {
+        constraintId: "vehicle-mike-sienna",
+        label: "Mike minivan (Sienna)",
+        owner: "Mike",
+        type: "vehicle",
+        shape: "rect",
+        width: 18,
+        height: 8,
+        color: "#6b7785",
+        x: 22,
+        y: 56,
+        notes: "18 ft x 8 ft Toyota Sienna minivan, from updated vehicle notes."
+      },
+      {
+        constraintId: "vehicle-nick-ellen-jeep",
+        label: "Nick & Ellen Jeep",
+        owner: "Nick & Ellen",
+        type: "vehicle",
+        shape: "rect",
+        width: 18,
+        height: 7,
+        color: "#66788f",
+        x: 42,
+        y: 56,
+        notes: "18 ft x 7 ft Jeep, from updated vehicle notes."
       },
       {
         constraintId: "vehicle-team-box-truck",
         label: "Team box truck",
+        owner: "Team",
         type: "vehicle",
         shape: "rect",
-        width: 35,
+        width: 26,
         height: 9,
         color: "#48586b",
-        x: 74,
-        y: 86,
-        notes: "35 ft box truck. Width and loading-door access side TBD; consider edge placement and storage/kitchen access."
+        x: 62,
+        y: 56,
+        notes: "26 ft x 9 ft box truck, from updated vehicle notes (previously modeled as 35 ft; length now corrected to 26 ft)."
       },
       {
-        constraintId: "vehicle-jeb-rissa-solar",
-        label: "Jeb/Rissa solar zone",
-        type: "other",
-        shape: "rect",
-        width: 12,
-        height: 12,
-        color: "#c6a33a",
-        x: 113,
-        y: 86,
-        notes: "12 ft x 12 ft south-facing lower-shade footprint. Needs clear sun exposure for solar panels. Confirm whether this is vehicle, trailer, or standalone solar setup."
-      },
-      {
-        constraintId: "vehicle-team-cargo-trailer",
-        label: "Team cargo trailer + stairs",
+        constraintId: "vehicle-team-hhc-trailer-stairs",
+        label: "Team HHC trailer + stairs",
+        owner: "Team",
         type: "vehicle",
         shape: "rect",
         width: 45,
-        height: 15,
+        height: 12,
         color: "#6c5f73",
-        x: 24,
-        y: 104,
-        notes: "45 ft x 9 ft cargo trailer plus 6 ft stair/access allowance, modeled as 45 ft x 15 ft effective footprint. Confirm stair side and access geometry."
+        x: 90,
+        y: 56,
+        notes: "45 ft x 12 ft cargo trailer with access stairs, from updated vehicle notes. Footprint now given directly as 45 ft x 12 ft (stairs included); confirm stair side."
+      }
+    ];
+
+    const DEFAULT_TENT_SHAPE_TEMPLATES = [
+      {
+        constraintId: "tent-brendan",
+        label: "Brendan tent",
+        owner: "Brendan",
+        type: "tent",
+        shape: "rect",
+        width: 14,
+        height: 13,
+        color: "#5f8f5b",
+        x: 76,
+        y: 114,
+        sleepCapacity: 1,
+        notes: "14 ft x 13 ft, from updated tent notes."
+      },
+      {
+        constraintId: "tent-caley",
+        label: "Caley tent",
+        owner: "Caley",
+        type: "tent",
+        shape: "rect",
+        width: 12,
+        height: 12,
+        color: "#5f8f5b",
+        x: 76,
+        y: 96,
+        sleepCapacity: 1,
+        notes: "12 ft x 12 ft, from updated tent notes."
+      },
+      {
+        constraintId: "tent-daniel-nipul-brandon",
+        label: "Daniel, Nipul & Brandon tent",
+        owner: "Daniel & Nipul & Brandon",
+        type: "tent",
+        shape: "rect",
+        width: 12,
+        height: 12,
+        color: "#5f8f5b",
+        x: 92.0,
+        y: 114,
+        sleepCapacity: 3,
+        notes: "12 ft x 12 ft, from updated tent notes."
+      },
+      {
+        constraintId: "tent-emily-colin",
+        label: "Emily & Colin tent",
+        owner: "Emily & Colin",
+        type: "tent",
+        shape: "rect",
+        width: 10,
+        height: 14,
+        color: "#5f8f5b",
+        x: 118,
+        y: 110.0,
+        sleepCapacity: 2,
+        notes: "10 ft x 14 ft, from updated tent notes."
+      },
+      {
+        constraintId: "tent-garret",
+        label: "Garret tent",
+        owner: "Garret",
+        type: "tent",
+        shape: "rect",
+        width: 16,
+        height: 16,
+        color: "#5f8f5b",
+        x: 22,
+        y: 108,
+        sleepCapacity: 1,
+        notes: "16 ft x 16 ft, from updated tent notes."
+      },
+      {
+        constraintId: "tent-gene",
+        label: "Gene tent",
+        owner: "Gene",
+        type: "tent",
+        shape: "rect",
+        width: 8,
+        height: 8,
+        color: "#5f8f5b",
+        x: 76,
+        y: 129.0,
+        sleepCapacity: 1,
+        notes: "8 ft x 8 ft, from updated tent notes."
+      },
+      {
+        constraintId: "tent-heather-isaac",
+        label: "Heather & Isaac tent",
+        owner: "Heather & Isaac",
+        type: "tent",
+        shape: "rect",
+        width: 10,
+        height: 10,
+        color: "#5f8f5b",
+        x: 130.0,
+        y: 110.0,
+        sleepCapacity: 2,
+        notes: "10 ft x 10 ft, from updated tent notes."
+      },
+      {
+        constraintId: "tent-ian",
+        label: "Ian tent",
+        owner: "Ian",
+        type: "tent",
+        shape: "rect",
+        width: 12,
+        height: 12,
+        color: "#5f8f5b",
+        x: 90,
+        y: 96,
+        sleepCapacity: 1,
+        notes: "12 ft x 12 ft, from updated tent notes."
+      },
+      {
+        constraintId: "tent-jake",
+        label: "Jake tent",
+        owner: "Jake",
+        type: "tent",
+        shape: "rect",
+        width: 12,
+        height: 12,
+        color: "#5f8f5b",
+        x: 118,
+        y: 96,
+        sleepCapacity: 1,
+        notes: "12 ft x 12 ft, from updated tent notes."
+      },
+      {
+        constraintId: "tent-jeb-rissa",
+        label: "Jeb & Rissa tent",
+        owner: "Jeb & Rissa",
+        type: "tent",
+        shape: "rect",
+        width: 14,
+        height: 14,
+        color: "#5f8f5b",
+        x: 46,
+        y: 119,
+        sleepCapacity: 2,
+        notes: "14 ft x 14 ft, from updated tent notes."
+      },
+      {
+        constraintId: "tent-johnny",
+        label: "Johnny tent",
+        owner: "Johnny",
+        type: "tent",
+        shape: "rect",
+        width: 12,
+        height: 12,
+        color: "#5f8f5b",
+        x: 132.0,
+        y: 96,
+        sleepCapacity: 1,
+        notes: "12 ft x 12 ft, from updated tent notes."
+      },
+      {
+        constraintId: "tent-matty",
+        label: "Matty tent",
+        owner: "Matty",
+        type: "tent",
+        shape: "rect",
+        width: 15,
+        height: 12,
+        color: "#5f8f5b",
+        x: 22,
+        y: 126.0,
+        sleepCapacity: 1,
+        notes: "15 ft x 12 ft, from updated tent notes."
+      },
+      {
+        constraintId: "tent-mike",
+        label: "Mike tent",
+        owner: "Mike",
+        type: "tent",
+        shape: "rect",
+        width: 10,
+        height: 10,
+        color: "#5f8f5b",
+        x: 118,
+        y: 126.0,
+        sleepCapacity: 1,
+        notes: "10 ft x 10 ft, from updated tent notes."
+      },
+      {
+        constraintId: "tent-nick-ellen",
+        label: "Nick & Ellen tent",
+        owner: "Nick & Ellen",
+        type: "tent",
+        shape: "rect",
+        width: 9,
+        height: 10,
+        color: "#5f8f5b",
+        x: 130.0,
+        y: 126.0,
+        sleepCapacity: 2,
+        notes: "9 ft x 10 ft, from updated tent notes."
+      },
+      {
+        constraintId: "tent-reid",
+        label: "Reid tent",
+        owner: "Reid",
+        type: "tent",
+        shape: "rect",
+        width: 12,
+        height: 12,
+        color: "#5f8f5b",
+        x: 104,
+        y: 96,
+        sleepCapacity: 1,
+        notes: "12 ft x 12 ft, from updated tent notes."
       }
     ];
 
     let genericPieceTemplates = DEFAULT_GENERIC_PIECES.slice();
     let constrainedVehicleTemplates = DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES.slice();
+    let tentShapeTemplates = DEFAULT_TENT_SHAPE_TEMPLATES.slice();
     let layoutLibraryEntries = [];
 
     const demoLayout = {
@@ -1029,6 +1350,7 @@
       layoutLibraryStatus: document.getElementById("layoutLibraryStatus"),
       palette: document.getElementById("palette"),
       constraintPalette: document.getElementById("constraintPalette"),
+      tentPalette: document.getElementById("tentPalette"),
       selectionPanel: document.getElementById("selectionPanel"),
       inventory: document.getElementById("inventory"),
       summary: document.getElementById("summary"),
@@ -1873,6 +2195,42 @@
       saveSoon();
     }
 
+    function loadTentShapes() {
+      const selected = [];
+      for (const [index, template] of tentShapeTemplates.entries()) {
+        const existing = state.items.find((entry) => entry.constraintId === template.constraintId);
+        if (existing) {
+          selected.push(existing.id);
+          continue;
+        }
+        const position = templateStartPosition(template, index);
+        const entry = item(
+          template.constraintId,
+          template.label,
+          template.type,
+          template.shape,
+          position.x,
+          position.y,
+          template.width,
+          template.height,
+          0,
+          template.color,
+          false,
+          template.notes || "",
+          false,
+          template.sleepCapacity
+        );
+        entry.layer = template.layer || defaultLayerForItem(entry);
+        entry.constraintId = template.constraintId;
+        entry.owner = template.owner || "";
+        state.items.push(entry);
+        selected.push(entry.id);
+      }
+      applySelection(selected, false);
+      renderPalette();
+      saveSoon();
+    }
+
     function templateStartPosition(template, index) {
       const hasX = Number.isFinite(Number(template.x));
       const hasY = Number.isFinite(Number(template.y));
@@ -1995,6 +2353,7 @@
     function renderPalette() {
       renderPaletteInto(els.palette, genericPieceTemplates);
       renderPaletteInto(els.constraintPalette, constrainedVehicleTemplates);
+      renderPaletteInto(els.tentPalette, tentShapeTemplates);
     }
 
     function renderPaletteInto(container, templates) {
@@ -2652,12 +3011,14 @@
     }
 
     async function loadToolboxAssets() {
-      const [genericPieces, vehicleShapes] = await Promise.all([
+      const [genericPieces, vehicleShapes, tentShapes] = await Promise.all([
         loadToolboxAsset(TOOLBOX_ASSETS.genericPieces, "pieces", DEFAULT_GENERIC_PIECES),
-        loadToolboxAsset(TOOLBOX_ASSETS.vehicleShapes, "shapes", DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES)
+        loadToolboxAsset(TOOLBOX_ASSETS.vehicleShapes, "shapes", DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES),
+        loadToolboxAsset(TOOLBOX_ASSETS.tentShapes, "shapes", DEFAULT_TENT_SHAPE_TEMPLATES)
       ]);
       genericPieceTemplates = genericPieces;
       constrainedVehicleTemplates = vehicleShapes;
+      tentShapeTemplates = tentShapes;
       renderPalette();
     }
 
@@ -3072,6 +3433,7 @@
     });
     document.getElementById("selectAll").addEventListener("click", () => applySelection(state.items.map((entry) => entry.id), false));
     document.getElementById("loadConstraintVehicles").addEventListener("click", loadConstraintVehicles);
+    document.getElementById("loadTentShapes").addEventListener("click", loadTentShapes);
     document.getElementById("duplicate").addEventListener("click", duplicateSelection);
     document.getElementById("group").addEventListener("click", groupSelection);
     document.getElementById("ungroup").addEventListener("click", ungroupSelection);

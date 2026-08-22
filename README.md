@@ -101,7 +101,7 @@ https://YOUR_USER.github.io/wee_camp_layout_tools/?layout=layouts/draft-1.json
 - Use Print / Save PDF to generate a layout and inventory PDF.
 - Load a starting layout from a hosted `layouts/index.json` library.
 - New hosted sessions without saved browser state load
-  `layouts/camp-layout-2026-06-21-isaac-edits.json` by default.
+  `layouts/camp-layout-2026-08-19-vehicle-tent-refresh.json` by default.
 
 The editable layout data is plain JSON in the browser state, so saved `.json`
 files can be versioned and reloaded later.
@@ -115,10 +115,15 @@ files can be versioned and reloaded later.
 - `VEHICLE_RAW_NOTES.md`: paste area for loose vehicle and trailer notes.
 - `VEHICLE_CONSTRAINTS.md`: structured vehicle constraints table derived from
   raw notes.
+- `TENT_RAW_NOTES.md`: paste area for tent and sleeping-arrangement notes.
+- `TENT_CONSTRAINTS.md`: structured tent footprint and sleeping-capacity table
+  derived from raw notes.
 - `assets/GENERIC_CAMP_PIECES.json`: reusable standard camp pieces used by the
   generic camp-pieces palette.
 - `assets/VEHICLE_SHAPES.json`: 2026-specific vehicle shape assumptions used by
   the constraint-object palette.
+- `assets/TENT_SHAPES.json`: named tent shapes derived from the tent roster,
+  used by the 2026 Tent Shapes palette.
 - `layouts/`: saved layout configurations and snapshots.
 - `layouts/index.json`: manifest of layouts shown in the Starting Layout
   dropdown when the app is served locally or hosted.
