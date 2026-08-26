@@ -28,10 +28,11 @@ before exporting when you want a human-readable variant name.
 
 For a non-editable snapshot of only the map, use `Export Layout JPG`. This
 downloads a flat image of the layout without the inventory pages used by
-Print / Save PDF. JPEG and PDF exports draw a scale reference: the number of
-linear feet that 1 inch represents when printed fit-to-width on Letter
-landscape paper, plus a graphic scale bar that stays accurate at any print
-size.
+Print / Save PDF. Both exports draw a graphic scale bar that stays accurate
+at any print size. PDF exports size the map to a fixed printed width on Letter
+landscape and state the linear feet that 1 inch represents at that size; JPEG
+exports state the feet-per-inch for fit-to-width printing as a labeled
+assumption.
 
 Before exporting a JPEG for placement submission, enter the camp and contact
 details in the JPEG Submission Details section. Those values are rendered in a
@@ -101,7 +102,7 @@ https://YOUR_USER.github.io/wee_camp_layout_tools/?layout=layouts/draft-1.json
 - Autosave in browser local storage.
 - Export/import the editable layout as JSON.
 - Export just the layout map as a JPG image with a printed-scale reference and graphic scale bar.
-- Use Print / Save PDF to generate a layout and inventory PDF with a printed-scale reference and graphic scale bar.
+- Use Print / Save PDF to generate a layout and inventory PDF with a fixed-size printed-scale reference and graphic scale bar.
 - Load a starting layout from a hosted `layouts/index.json` library.
 - New hosted sessions without saved browser state load
   `layouts/camp-layout-2026-08-19-vehicle-tent-refresh.json` by default.

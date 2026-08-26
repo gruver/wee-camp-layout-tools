@@ -482,6 +482,9 @@
         overflow: visible;
         background: #ffffff;
       }
+      body {
+        display: block;
+      }
 
       body > aside,
       body > main {
@@ -539,7 +542,7 @@
       }
 
       @page {
-        size: landscape;
+        size: letter landscape;
         margin: 0.35in;
       }
     }
@@ -799,9 +802,14 @@
     const DPR = Math.max(1, window.devicePixelRatio || 1);
     // Print geometry shared by the @page CSS rule and export rendering.
     // @page is US Letter landscape with 0.35in margins; exports render at a
-    // fixed pixel size and assume fit-to-width printing.
+    // fixed pixel size. The PDF print sheet sizes the map image to an exact
+    // printed width (see printedImageWidthIn) so its printed-scale claim is
+    // deterministic; the JPEG keeps the conditional fit-to-width claim.
     const PRINT_PAGE_WIDTH_IN = 11;
+    const PRINT_PAGE_HEIGHT_IN = 8.5;
     const PRINT_PAGE_MARGIN_IN = 0.35;
+    // Heading + meta line above the map on the print sheet.
+    const PRINT_HEADER_RESERVE_IN = 0.65;
     const EXPORT_IMAGE_WIDTH_PX = 1400;
     const EXPORT_IMAGE_PAD_PX = 82;
     const EXPORT_SITE_WIDTH_PX = EXPORT_IMAGE_WIDTH_PX - EXPORT_IMAGE_PAD_PX * 2;
@@ -3128,8 +3136,10 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
       return JSON.parse(decodeURIComponent(atob(padded)));
     }
 
-    function preparePrint() {
-      const image = renderPrintImage();
+    async function preparePrint() {
+      const imageHeightPx = Math.round(EXPORT_SITE_WIDTH_PX * state.site.height / state.site.width) + EXPORT_IMAGE_PAD_PX * 2;
+      const printedWidthIn = printedImageWidthIn(EXPORT_IMAGE_WIDTH_PX, imageHeightPx);
+      const image = renderPrintImage("image/png", undefined, { printedWidthIn });
       const rows = state.items
         .slice()
         .sort((a, b) => a.type.localeCompare(b.type) || a.label.localeCompare(b.label))
@@ -3147,8 +3157,8 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
         `).join("");
       els.printSheet.innerHTML = `
         <h1>Camp Layout</h1>
-        <div class="print-meta">${state.placement.address}. ${state.site.width} x ${state.site.height} ft site. ${state.placement.frontageFacing}. ${state.site.serviceLaneWidth} ft service lane. Exported ${new Date().toLocaleString()}. Scale: 1 in = ${formatFeet(printFeetPerInchRounded())} linear ft when printed fit-to-width on Letter landscape.</div>
-        <img class="print-layout" src="${image}" alt="Camp layout">
+        <div class="print-meta">${state.placement.address}. ${state.site.width} x ${state.site.height} ft site. ${state.placement.frontageFacing}. ${state.site.serviceLaneWidth} ft service lane. Exported ${new Date().toLocaleString()}. Scale: 1 in = ${formatFeetPerInch(feetPerInchForPrintedWidth(printedWidthIn))} linear ft (map prints ${printedWidthIn.toFixed(2)} in wide).</div>
+        <img class="print-layout" style="width: ${printedWidthIn.toFixed(3)}in" src="${image}" alt="Camp layout">
         <div class="print-grid">
           <div>
             <h2>Inventory</h2>
@@ -3166,6 +3176,22 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
           </div>
         </div>
       `;
+      const printImage = els.printSheet.querySelector(".print-layout");
+      if (printImage) {
+        if (typeof printImage.decode === "function") {
+          await printImage.decode();
+        } else {
+          await new Promise((resolve, reject) => {
+            const fail = () => reject(new Error("The print image could not be loaded."));
+            printImage.addEventListener("load", resolve, { once: true });
+            printImage.addEventListener("error", fail, { once: true });
+            if (printImage.complete) {
+              if (printImage.naturalWidth > 0) resolve();
+              else fail();
+            }
+          });
+        }
+      }
     }
 
     function exportLayoutJpg() {
@@ -3250,7 +3276,7 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
         pctx.fillText(`${entry.width}x${entry.height}`, 0, 15);
         pctx.restore();
       }
-      drawExportScaleReference(pctx, pad, mapTop + siteHeight, scale);
+      drawExportScaleReference(pctx, pad, mapTop + siteHeight, scale, options.printedWidthIn || null);
       drawPrintOrientation(pctx, pad, mapTop, siteWidth, siteHeight);
       return offscreen.toDataURL(mimeType, quality);
     }
@@ -3259,28 +3285,47 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
       return PRINT_PAGE_WIDTH_IN - PRINT_PAGE_MARGIN_IN * 2;
     }
 
-    function printFeetPerInch(siteWidthPx, imageWidthPx) {
-      return state.site.width / (printContentWidthIn() * siteWidthPx / imageWidthPx);
+    function printContentHeightIn() {
+      return PRINT_PAGE_HEIGHT_IN - PRINT_PAGE_MARGIN_IN * 2 - PRINT_HEADER_RESERVE_IN;
     }
 
-    function printFeetPerInchRounded() {
-      return Math.round(printFeetPerInch(EXPORT_SITE_WIDTH_PX, EXPORT_IMAGE_WIDTH_PX) * 10) / 10;
+    // Printed width the PDF map image is sized to: full content width unless
+    // the image aspect would push it past the first page's free height.
+    function printedImageWidthIn(imageWidthPx, imageHeightPx) {
+      return Math.min(printContentWidthIn(), printContentHeightIn() * imageWidthPx / imageHeightPx);
     }
 
-    function drawExportScaleReference(pctx, left, bottomY, pxPerFt) {
+    function feetPerInchForPrintedWidth(printedImageWidthInches) {
+      const printedSiteInches = printedImageWidthInches * EXPORT_SITE_WIDTH_PX / EXPORT_IMAGE_WIDTH_PX;
+      return state.site.width / printedSiteInches;
+    }
+
+    function formatFeetPerInch(feetPerInch) {
+      return formatFeet(Math.round(feetPerInch * 10) / 10);
+    }
+
+    function drawExportScaleReference(pctx, left, bottomY, pxPerFt, printedWidthIn) {
       const barFt = [100, 50, 25, 20, 10].find((ft) => ft * pxPerFt <= 370) || 5;
       const barLength = barFt * pxPerFt;
       const barTop = bottomY + 52;
       const barHeight = 8;
+      const feetPerInch = feetPerInchForPrintedWidth(printedWidthIn || printContentWidthIn());
       pctx.save();
       pctx.textAlign = "left";
       pctx.textBaseline = "middle";
       pctx.fillStyle = "#111111";
       pctx.font = `700 18px ${FONT_FAMILY}`;
-      pctx.fillText(`SCALE: 1 in = ${formatFeet(printFeetPerInchRounded())} linear ft`, left, bottomY + 22, 380);
+      pctx.fillText(`SCALE: 1 in = ${formatFeetPerInch(feetPerInch)} linear ft`, left, bottomY + 22, 380);
       pctx.fillStyle = "#666666";
       pctx.font = `13px ${FONT_FAMILY}`;
-      pctx.fillText("when printed fit-to-width on 11x8.5 in landscape", left, bottomY + 42, 380);
+      pctx.fillText(
+        printedWidthIn
+          ? `map sized to print ${printedWidthIn.toFixed(2)} in wide on letter landscape`
+          : "when printed fit-to-width on 11x8.5 in landscape",
+        left,
+        bottomY + 42,
+        380
+      );
       for (let i = 0; i < 5; i++) {
         pctx.fillStyle = i % 2 === 0 ? "#111111" : "#ffffff";
         pctx.fillRect(left + (barLength / 5) * i, barTop, barLength / 5, barHeight);
@@ -3564,9 +3609,13 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
       importRosterFile(event.target.files[0]);
       event.target.value = "";
     });
-    document.getElementById("printPdf").addEventListener("click", () => {
-      preparePrint();
-      window.print();
+    document.getElementById("printPdf").addEventListener("click", async () => {
+      try {
+        await preparePrint();
+        window.print();
+      } catch (error) {
+        alert(`Could not prepare the print image: ${error.message}`);
+      }
     });
     document.getElementById("newType").addEventListener("change", syncCustomSleepControl);
     document.getElementById("addCustom").addEventListener("click", () => {
