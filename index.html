@@ -797,6 +797,14 @@
     const STORAGE_KEY = "camp-layout-planner-v2";
     const FONT_FAMILY = '"IBM Plex Sans", "Helvetica Neue", Arial, sans-serif';
     const DPR = Math.max(1, window.devicePixelRatio || 1);
+    // Print geometry shared by the @page CSS rule and export rendering.
+    // @page is US Letter landscape with 0.35in margins; exports render at a
+    // fixed pixel size and assume fit-to-width printing.
+    const PRINT_PAGE_WIDTH_IN = 11;
+    const PRINT_PAGE_MARGIN_IN = 0.35;
+    const EXPORT_IMAGE_WIDTH_PX = 1400;
+    const EXPORT_IMAGE_PAD_PX = 82;
+    const EXPORT_SITE_WIDTH_PX = EXPORT_IMAGE_WIDTH_PX - EXPORT_IMAGE_PAD_PX * 2;
     const SITE_DEFAULTS = {
       width: 150,
       height: 150,
@@ -3139,7 +3147,7 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
         `).join("");
       els.printSheet.innerHTML = `
         <h1>Camp Layout</h1>
-        <div class="print-meta">${state.placement.address}. ${state.site.width} x ${state.site.height} ft site. ${state.placement.frontageFacing}. ${state.site.serviceLaneWidth} ft service lane. Exported ${new Date().toLocaleString()}.</div>
+        <div class="print-meta">${state.placement.address}. ${state.site.width} x ${state.site.height} ft site. ${state.placement.frontageFacing}. ${state.site.serviceLaneWidth} ft service lane. Exported ${new Date().toLocaleString()}. Scale: 1 in = ${formatFeet(printFeetPerInchRounded())} linear ft when printed fit-to-width on Letter landscape.</div>
         <img class="print-layout" src="${image}" alt="Camp layout">
         <div class="print-grid">
           <div>
@@ -3175,8 +3183,8 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
     }
 
     function renderPrintImage(mimeType = "image/png", quality, options = {}) {
-      const width = 1400;
-      const pad = 82;
+      const width = EXPORT_IMAGE_WIDTH_PX;
+      const pad = EXPORT_IMAGE_PAD_PX;
       const headerHeight = options.submissionHeader ? 170 : 0;
       const mapTop = pad + headerHeight;
       const siteWidth = width - pad * 2;
@@ -3242,8 +3250,50 @@ const DEFAULT_CONSTRAINED_VEHICLE_TEMPLATES = [
         pctx.fillText(`${entry.width}x${entry.height}`, 0, 15);
         pctx.restore();
       }
+      drawExportScaleReference(pctx, pad, mapTop + siteHeight, scale);
       drawPrintOrientation(pctx, pad, mapTop, siteWidth, siteHeight);
       return offscreen.toDataURL(mimeType, quality);
+    }
+
+    function printContentWidthIn() {
+      return PRINT_PAGE_WIDTH_IN - PRINT_PAGE_MARGIN_IN * 2;
+    }
+
+    function printFeetPerInch(siteWidthPx, imageWidthPx) {
+      return state.site.width / (printContentWidthIn() * siteWidthPx / imageWidthPx);
+    }
+
+    function printFeetPerInchRounded() {
+      return Math.round(printFeetPerInch(EXPORT_SITE_WIDTH_PX, EXPORT_IMAGE_WIDTH_PX) * 10) / 10;
+    }
+
+    function drawExportScaleReference(pctx, left, bottomY, pxPerFt) {
+      const barFt = [100, 50, 25, 20, 10].find((ft) => ft * pxPerFt <= 370) || 5;
+      const barLength = barFt * pxPerFt;
+      const barTop = bottomY + 52;
+      const barHeight = 8;
+      pctx.save();
+      pctx.textAlign = "left";
+      pctx.textBaseline = "middle";
+      pctx.fillStyle = "#111111";
+      pctx.font = `700 18px ${FONT_FAMILY}`;
+      pctx.fillText(`SCALE: 1 in = ${formatFeet(printFeetPerInchRounded())} linear ft`, left, bottomY + 22, 380);
+      pctx.fillStyle = "#666666";
+      pctx.font = `13px ${FONT_FAMILY}`;
+      pctx.fillText("when printed fit-to-width on 11x8.5 in landscape", left, bottomY + 42, 380);
+      for (let i = 0; i < 5; i++) {
+        pctx.fillStyle = i % 2 === 0 ? "#111111" : "#ffffff";
+        pctx.fillRect(left + (barLength / 5) * i, barTop, barLength / 5, barHeight);
+      }
+      pctx.strokeStyle = "#111111";
+      pctx.lineWidth = 1;
+      pctx.strokeRect(left, barTop, barLength, barHeight);
+      pctx.fillStyle = "#333333";
+      pctx.font = `12px ${FONT_FAMILY}`;
+      pctx.fillText("0", left, barTop + barHeight + 8, 40);
+      pctx.textAlign = "right";
+      pctx.fillText(`${barFt} ft`, left + barLength, barTop + barHeight + 8, 80);
+      pctx.restore();
     }
 
     function submissionDetails() {
